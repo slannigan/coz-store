@@ -1,0 +1,40 @@
+create table products (
+  id integer,
+  name text,
+  slug text,
+  grams integer,
+  cents integer,
+  description text
+);
+insert into products values (
+  1,
+  'Foreshadowing Light LIVE: CD Digital Download',
+  'fl-live-mp3s',
+  0,
+  900,
+  'MP3 files of all songs on the Foreshadowing Light LIVE CD.'
+);
+insert into products values (
+  2,
+  'Foreshadowing Light LIVE: CD',
+  'fl-live-cd',
+  150,
+  1200,
+  'CD with booklet containing lyrics and images.'
+);
+insert into products values (
+  3,
+  'Foreshadowing Light LIVE: DVD',
+  'fl-live-dvd',
+  150,
+  1500,
+  'DVD of the live performance.'
+);
+insert into products values (
+  4,
+  'Foreshadowing Light LIVE: CD & DVD',
+  'fl-live-cd-dvd',
+  300,
+  2200,
+  'CD and DVD - save $5 by purchasing both!'
+);
