@@ -4,10 +4,10 @@
       v-bind:itemsInCart='cart.length' />
     <h1>Main Page</h1>
     <ProductList
-      v-bind:itemsInCart='cart.length'
       v-on:add-to-cart='addToCart' />
     <Cart
-      v-bind:cart='cart' />
+      v-bind:cart='cart'
+      v-on:remove-from-cart='removeFromCart' />
   </div>
 </template>
 
@@ -25,13 +25,15 @@ export default {
   },
   data: function() {
     return {
-      cart: [],
-      itemsInCart: 1
+      cart: []
     };
   },
   methods: {
     addToCart: function(product) {
       this.cart.push(product);
+    },
+    removeFromCart: function(product) {
+      this.cart.splice(this.cart.indexOf(product), 1);
     }
   }
 };
