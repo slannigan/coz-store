@@ -1,0 +1,25 @@
+create table transactions (
+  id SERIAL PRIMARY KEY,
+  first_name varchar(32) NOT NULL,
+  last_name varchar(32) NOT NULL,
+  email varchar(255) NOT NULL,
+  address_line_1 varchar(255),
+  address_line_2 varchar(255),
+  city varchar(32),
+  province varchar(2),
+  postal_code text,
+  stripe_charge_id text,
+  cents_charged_shipping integer NOT NULL DEFAULT 0,
+  cents_charged_total integer NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT NOW()
+);
+
+alter table products add primary key(id);
+
+create table purchased_items (
+  id SERIAL PRIMARY KEY,
+  transaction_id integer REFERENCES transactions(id),
+  product_id integer REFERENCES products(id),
+  cents_charged integer NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT NOW()
+);

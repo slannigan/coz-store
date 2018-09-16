@@ -23,6 +23,7 @@
       </div>
       <hr>
       <Stripe
+        v-bind:cart="cart"
         v-bind:centsCharged="centsCharged" />
     </div>
     <div v-else>

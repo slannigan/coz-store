@@ -7,7 +7,10 @@
       v-if="error">
       {{ error }}
     </div>
+    <div v-if="submitting">Submitting...</div>
+    <div v-else-if="success" class='success'>Success!</div>
     <button
+      v-else
       v-on:click="submit()">Submit payment</button>
   </div>
 </template>
@@ -18,6 +21,7 @@ const axios = require('axios');
 export default {
   name: 'Stripe',
   props: {
+    cart: Array,
     centsCharged: Number
   },
   data: function() {
@@ -31,6 +35,7 @@ export default {
   },
   methods: {
     submit: function() {
+      this.error = '';
       this.submitting = true;
       this.success = false;
       this.stripe.createToken(this.card).then((result) => {
@@ -42,6 +47,7 @@ export default {
           // Send the token to your server.
           axios
             .post(`${process.env.API_URL}/transactions`, {
+              cart: this.cart,
               cents_charged_total: this.centsCharged,
               stripe_token: result.token
             })
@@ -91,5 +97,9 @@ export default {
   color: #fff;
   margin: 1rem 0;
   padding: 0.5rem 1rem;
+}
+
+.success {
+  color: #0f4;
 }
 </style>

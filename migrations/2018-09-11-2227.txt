@@ -1,5 +1,5 @@
 create table products (
-  id integer,
+  id SERIAL PRIMARY KEY,
   name text,
   slug text,
   grams integer,
