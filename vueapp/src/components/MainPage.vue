@@ -32,7 +32,7 @@ export default {
   },
   methods: {
     addToCart: function(product) {
-      if (!product.weight) {
+      if (!product.grams) {
         const alreadyPurchased = !!this.cart.find((otherProduct) => {
           return otherProduct.id === product.id;
         });
