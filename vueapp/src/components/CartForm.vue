@@ -48,6 +48,9 @@
         v-model="shippingMethod" />
       <label for="input-mail">
         Mail
+        <span v-if="shippingCost">
+          (+{{ shippingCost }})
+        </span>
       </label>
       <br>
       <div
@@ -82,19 +85,19 @@
         id="input-province"
         v-model="province">
         <option value="">Select a province</option>
-        <option value="AB">AB</option>
-        <option value="BC">BC</option>
-        <option value="MB">MB</option>
-        <option value="NB">NB</option>
-        <option value="NL">NL</option>
-        <option value="NS">NS</option>
-        <option value="ON">ON</option>
-        <option value="PE">PE</option>
-        <option value="QC">QC</option>
-        <option value="SK">SK</option>
-        <option value="NT">NT</option>
-        <option value="NU">NU</option>
-        <option value="YT">YT</option>
+        <option value="AB">Alberta</option>
+        <option value="BC">British Columbia</option>
+        <option value="MB">Manitoba</option>
+        <option value="NB">New Brunswick</option>
+        <option value="NL">Newfoundland</option>
+        <option value="NS">Nova Scotia</option>
+        <option value="ON">Ontario</option>
+        <option value="PE">PEI</option>
+        <option value="QC">Québec</option>
+        <option value="SK">Saskatchewan</option>
+        <option value="NT">Northwest Territories</option>
+        <option value="NU">Nunavut</option>
+        <option value="YT">Yukong</option>
       </select>
       <div
         v-if="errorProvince"
@@ -114,6 +117,11 @@
       If you'd like to order more than four items, you can select a "Pick up" method, or contact us at (EMAIL) if you would like a bulk order shipped to you.
       <br><br>
     </div>
+    <div
+      v-else-if="shippingMethod">
+      We will email you details about how to pick up your order once the order has been shipped to us.
+      <br><br>
+    </div>
   </div>
 </template>
 
@@ -127,6 +135,7 @@ export default {
   },
   props: {
     isSubmitting: Boolean,
+    shippingCost: String,
     weight: Number
   },
   data: function() {
@@ -323,6 +332,14 @@ export default {
     isSubmitting: function(val) {
       if (val) {
         this.submit();
+      }
+    },
+    isMailSelected: function(val) {
+      this.$emit('set-is-mailing', val);
+    },
+    weight: function(val) {
+      if (!val) {
+        this.shippingMethod = null;
       }
     }
   }

@@ -17,17 +17,29 @@
           {{ centsToDollars(product.cents) }}
         </div>
       </div>
+      <div
+        v-if="chargedShippingCost"
+        class='cart-product'>
+        <div>
+          Shipping:
+        </div>
+        <div>
+          {{ centsToDollars(chargedShippingCost) }}
+        </div>
+      </div>
       <hr>
       <div class='total'>
-        Total: {{ centsToDollars(centsCharged) }}
+        Total: {{ centsToDollars(totalCost) }}
       </div>
       <br>
       <h4>Submission Form</h4>
       <CartForm
         v-bind:weight="weight"
         v-bind:isSubmitting="isSubmitting"
+        v-bind:shippingCost="centsToDollars(shippingCost)"
         v-on:cancel-submit="cancelSubmit"
-        v-on:set-cart-form-data="setCartFormData" />
+        v-on:set-cart-form-data="setCartFormData"
+        v-on:set-is-mailing="setIsMailing" />
       <Stripe
         v-bind:isSubmitting="isSubmitting"
         v-on:cancel-submit="cancelSubmit"
@@ -74,6 +86,7 @@ export default {
     return {
       cartFormData: null,
       error: '',
+      isMailing: false,
       isSubmitting: false,
       submittedSuccessfully: false,
       stripeToken: null
@@ -83,12 +96,36 @@ export default {
     cart: Array
   },
   computed: {
-    centsCharged: function() {
+    chargedShippingCost: function() {
+      return this.isMailing && this.shippingCost;
+    },
+    productsCost: function() {
       let sum = 0;
       for (let i = 0; i < this.cart.length; i++) {
         sum += this.cart[i].cents;
       }
       return sum;
+    },
+    shippingCost: function() {
+      const weight = this.weight;
+      if (!weight || weight > 600) {
+        return;
+      }
+      const envelopeCost = 100;
+      const shippingFor100To200Grams = Math.ceil(295 * 1.13);
+      const shippingFor300To400Grams = Math.ceil(470 * 1.13);
+      if (weight === 150) {
+        return envelopeCost + shippingFor100To200Grams;
+      } else if (weight === 300) {
+        return envelopeCost + shippingFor300To400Grams;
+      } else if (weight === 450) {
+        return (2 * envelopeCost) + shippingFor100To200Grams + shippingFor300To400Grams;
+      } else if (weight === 600) {
+        return (2 * envelopeCost) + (2 * shippingFor300To400Grams);
+      }
+    },
+    totalCost: function() {
+      return this.productsCost + (this.chargedShippingCost || 0);
     },
     weight: function() {
       let sum = 0;
@@ -111,13 +148,18 @@ export default {
       this.error = error || '';
     },
     centsToDollars: function(cents) {
-      return `$${(cents / 100).toFixed(2)}`;
+      if (cents) {
+        return `$${(cents / 100).toFixed(2)}`;
+      }
     },
     setCartFormData: function(data) {
       if (this.isSubmitting) {
         this.cartFormData = data;
         this.attemptSubmit();
       }
+    },
+    setIsMailing: function(val) {
+      this.isMailing = val;
     },
     setStripeToken: function(token) {
       if (this.isSubmitting) {
@@ -131,7 +173,8 @@ export default {
           address_line_1: this.cartFormData.address_line_1,
           address_line_2: this.cartFormData.address_line_2,
           cart: this.cart,
-          cents_charged_total: this.centsCharged,
+          cents_charged_shipping: this.chargedShippingCost,
+          cents_charged_total: this.totalCost,
           city: this.cartFormData.city,
           first_name: this.cartFormData.first_name,
           last_name: this.cartFormData.last_name,
@@ -143,6 +186,7 @@ export default {
         .then((response) => {
           // this.products = response.data.products;
           this.submittedSuccessfully = true;
+          this.$emit('clear-cart');
         })
         .catch((error) => {
           this.error = error;
