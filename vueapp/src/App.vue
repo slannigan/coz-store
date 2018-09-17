@@ -24,4 +24,10 @@ export default {
   max-width: 1024px;
   width: 100%;
 }
+
+.error {
+  background-color: #f00;
+  color: #fff;
+  padding: 0.5rem 1rem;
+}
 </style>

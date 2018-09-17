@@ -1,66 +1,41 @@
 <template>
   <div>
-    <h4>Credit Card Input (won't charge for realsies yet)</h4>
-    <div id="card-element"></div>
+    <div
+      id="card-element"
+      class="card-element">
+    </div>
     <div
       class="error"
       v-if="error">
       {{ error }}
     </div>
-    <div v-if="submitting">Submitting...</div>
-    <div v-else-if="success" class='success'>Success!</div>
-    <button
-      v-else
-      v-on:click="submit()">Submit payment</button>
   </div>
 </template>
 
 <script>
-const axios = require('axios');
-
 export default {
   name: 'Stripe',
   props: {
-    cart: Array,
-    centsCharged: Number
+    isSubmitting: Boolean
   },
   data: function() {
     return {
       card: null,
       error: '',
-      stripe: null,
-      submitting: false,
-      success: false
+      stripe: null
     };
   },
   methods: {
     submit: function() {
       this.error = '';
-      this.submitting = true;
-      this.success = false;
       this.stripe.createToken(this.card).then((result) => {
         if (result.error) {
           // Inform the customer that there was an error.
           this.error = result.error.message;
-          this.submitting = false;
+          this.$emit('cancel-submit');
         } else {
           // Send the token to your server.
-          axios
-            .post(`${process.env.API_URL}/transactions`, {
-              cart: this.cart,
-              cents_charged_total: this.centsCharged,
-              stripe_token: result.token
-            })
-            .then((response) => {
-              // this.products = response.data.products;
-              this.success = true;
-            })
-            .catch((error) => {
-              this.error = error;
-            })
-            .finally(() => {
-              this.submitting = false;
-            });
+          this.$emit('set-stripe-token', result.token);
         }
       });
     }
@@ -87,19 +62,29 @@ export default {
     this.card.addEventListener('change', (event) => {
       this.error = event.error ? event.error.message : '';
     });
+  },
+  watch: {
+    isSubmitting: function(val) {
+      if (val) {
+        this.submit();
+      }
+    }
   }
 }
 </script>
 
 <style>
 .error {
-  background-color: #f00;
-  color: #fff;
   margin: 1rem 0;
-  padding: 0.5rem 1rem;
 }
 
 .success {
   color: #0f4;
+}
+
+.card-element {
+  border: 1px solid #f00;
+  max-width: 600px;
+  padding: 0.5rem 1rem;
 }
 </style>
