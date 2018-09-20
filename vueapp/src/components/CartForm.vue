@@ -97,7 +97,7 @@
         <option value="SK">Saskatchewan</option>
         <option value="NT">Northwest Territories</option>
         <option value="NU">Nunavut</option>
-        <option value="YT">Yukong</option>
+        <option value="YT">Yukon</option>
       </select>
       <div
         v-if="errorProvince"

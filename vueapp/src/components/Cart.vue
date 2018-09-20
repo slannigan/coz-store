@@ -97,7 +97,7 @@ export default {
   },
   computed: {
     chargedShippingCost: function() {
-      return this.isMailing && this.shippingCost;
+      return (this.isMailing && this.shippingCost) || 0;
     },
     productsCost: function() {
       let sum = 0;
@@ -173,9 +173,11 @@ export default {
           address_line_1: this.cartFormData.address_line_1,
           address_line_2: this.cartFormData.address_line_2,
           cart: this.cart,
+          cents_charged_donation: 0, // TODO: add donation
           cents_charged_shipping: this.chargedShippingCost,
           cents_charged_total: this.totalCost,
           city: this.cartFormData.city,
+          email: this.cartFormData.email,
           first_name: this.cartFormData.first_name,
           last_name: this.cartFormData.last_name,
           pickup_location: this.cartFormData.pickup_location,
