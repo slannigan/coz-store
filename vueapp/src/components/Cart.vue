@@ -11,10 +11,16 @@
             v-on:click="$emit('remove-from-cart', product)">
             (x)
           </a>
+          <a
+            class='remove'
+            v-if="!product.cents"
+            v-on:click="$emit('edit-product', product)">
+            (edit)
+          </a>
           {{ product.name }}
         </div>
         <div>
-          {{ centsToDollars(product.cents) }}
+          {{ centsToDollars(product.cents_charged) }}
         </div>
       </div>
       <div
@@ -100,11 +106,9 @@ export default {
       return (this.isMailing && this.shippingCost) || 0;
     },
     productsCost: function() {
-      let sum = 0;
-      for (let i = 0; i < this.cart.length; i++) {
-        sum += this.cart[i].cents;
-      }
-      return sum;
+      return this.cart.reduce((accumulator, currentVal) => {
+        return accumulator + currentVal.cents_charged;
+      }, 0);
     },
     shippingCost: function() {
       const weight = this.weight;

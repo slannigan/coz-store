@@ -8,12 +8,18 @@
     <Cart
       v-bind:cart='cart'
       v-on:clear-cart='clearCart'
-      v-on:remove-from-cart='removeFromCart' />
+      v-on:remove-from-cart='removeFromCart'
+      v-on:edit-product='editProduct' />
+    <EditModal
+      v-if='productToEdit'
+      v-bind:product='productToEdit'
+      v-on:done-edit='doneEdit' />
   </div>
 </template>
 
 <script>
 import Cart from './Cart.vue';
+import EditModal from './EditModal.vue';
 import Nav from './Nav.vue';
 import ProductList from './ProductList.vue';
 
@@ -21,13 +27,15 @@ export default {
   name: 'MainPage',
   components: {
     Cart,
+    EditModal,
     Nav,
     ProductList
   },
   data: function() {
     return {
       cart: [],
-      isLocalStorageAvailable: false
+      isLocalStorageAvailable: false,
+      productToEdit: null
     };
   },
   methods: {
@@ -40,8 +48,26 @@ export default {
           return alert(`You can only purchase one ${product.name}.`);
         }
       }
+      if (product.slug === 'donation') {
+        return this.productToEdit = product;
+      }
+      product.cents_charged = product.cents;
       this.cart.push(product);
       this.updateLocalStorage();
+    },
+    doneEdit: function(newVal) {
+      if (newVal) {
+        const existsInCart = this.cart.indexOf(this.productToEdit) > -1;
+        this.productToEdit.cents_charged = newVal;
+        if (!existsInCart) {
+          this.cart.push(this.productToEdit);
+        }
+        this.updateLocalStorage();
+      }
+      this.productToEdit = null;
+    },
+    editProduct: function(product) {
+      this.productToEdit = product;
     },
     clearCart: function() {
       this.cart = [];
@@ -75,4 +101,7 @@ export default {
 </script>
 
 <style>
+.main {
+  position: relative;
+}
 </style>

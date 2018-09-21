@@ -2,7 +2,7 @@
   <div class='product'>
     <h4>{{ product.name }}</h4>
     <div>{{ product.description }}</div>
-    <h4>{{ cost }}</h4>
+    <h4 v-if="product.cents">{{ cost }}</h4>
     <button
       v-on:click="$emit('add-to-cart')">
       Add to cart

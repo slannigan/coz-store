@@ -51,8 +51,7 @@ router.post('/transactions', async (req, res) => {
     `);
     transactionId = transaction.rows[0].id;
     let purchasedItems = req.body.cart.map((item) => {
-      const charged = (item.slug === 'donation') ? req.body.cents_charged_donation : item.cents;
-      return `(${transactionId}, ${item.id}, ${charged})`;
+      return `(${transactionId}, ${item.id}, ${item.cents_charged})`;
     });
     const purchasedItemsStr = purchasedItems.join(', ');
     await client.query(`
@@ -123,8 +122,6 @@ const validateTransaction = async (vals, client) => {
 
   validate(vals.cents_charged_shipping, v.isNum, 'Shipping cost must be a positive number.');
 
-  validate(vals.cents_charged_donation, v.isNum, 'Donation cost must be a positive number.');
-
   // Validate that the cart is valid
   validate(vals.cart, v.requiredArray, 'Cart is not valid.');
   vals.cart.forEach((item) => {
@@ -156,8 +153,8 @@ const validateTransaction = async (vals, client) => {
     }
   });
 
-  // Validate that items of zero weight don't occur more than once
   vals.cart.forEach((item) => {
+    // Validate that items of zero weight don't occur more than once
     if (item.grams === 0) {
       const itemsOfSameType = vals.cart.filter((otherItem) => {
         return otherItem.id === item.id;
@@ -166,15 +163,13 @@ const validateTransaction = async (vals, client) => {
         throw 'You can\'t purchase a digital item more than once.';
       }
     }
-  });
 
-  // If a donation is in the cart, be sure inputted donation value exists
-  const donationProduct = vals.cart.find((item) => {
-    return item.slug === 'donation';
+    // Validate that we're charging for items correctly
+    validate(item.cents_charged, v.isNumGt0, 'Cart items need to cost more than $0.');
+    if (!!item.cents && (item.cents !== item.cents_charged)) {
+      throw 'Item is being charged for incorrectly.';
+    }
   });
-  if (donationProduct && !vals.cents_charged_donation) {
-    throw 'Donation must be greater than zero.';
-  }
 
   // If shipping is required, validate shipping values
   const weight = vals.cart.reduce((accumulator, currentVal) => {
@@ -234,9 +229,9 @@ const validateTransaction = async (vals, client) => {
 
   // Validate total cost
   const totalItemCost = vals.cart.reduce((accumulator, currentVal) => {
-    return accumulator + currentVal.cents;
+    return accumulator + currentVal.cents_charged;
   }, 0);
-  if (vals.cents_charged_total !== (vals.cents_charged_shipping + vals.cents_charged_donation + totalItemCost)) {
+  if (vals.cents_charged_total !== (vals.cents_charged_shipping + totalItemCost)) {
     throw 'Total cost does not match the cost of the cart items plus shipping plus donation.';
   }
 };

@@ -4,37 +4,41 @@ create table products (
   slug text,
   grams integer,
   cents integer,
-  description text
+  description text,
+  created_at timestamptz NOT NULL DEFAULT NOW()
 );
-insert into products values (
-  1,
+insert into products(name, slug, grams, cents, description) values (
   'Foreshadowing Light LIVE: CD Digital Download',
   'fl-live-mp3s',
   0,
   900,
   'MP3 files of all songs on the Foreshadowing Light LIVE CD.'
 );
-insert into products values (
-  2,
+insert into products(name, slug, grams, cents, description) values (
   'Foreshadowing Light LIVE: CD',
   'fl-live-cd',
   150,
   1200,
   'CD with booklet containing lyrics and images.'
 );
-insert into products values (
-  3,
+insert into products(name, slug, grams, cents, description) values (
   'Foreshadowing Light LIVE: DVD',
   'fl-live-dvd',
   150,
   1500,
   'DVD of the live performance.'
 );
-insert into products values (
-  4,
+insert into products(name, slug, grams, cents, description) values (
   'Foreshadowing Light LIVE: CD & DVD',
   'fl-live-cd-dvd',
   300,
   2200,
   'CD and DVD - save $5 by purchasing both!'
+);
+insert into products(name, slug, grams, cents, description) values (
+  'Donation',
+  'donation',
+  0,
+  0,
+  'All proceeds go to future Citizen of Zion projects.'
 );
