@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class='cart-form'>
+    <h3>General Information</h3>
     <TextInput
       key="first-name"
       label="First Name"
@@ -18,11 +19,10 @@
       v-bind:val.sync="email"
       v-bind:error="errorEmail"
       v-bind:forceShowError="hasSubmitted" />
-    <br>
+    <br><br>
     <div
       v-if="showShippingMethods">
-      Shipping method:
-      <br>
+      <h3>Shipping Method</h3>
       <input
         type="radio"
         id="input-orangeville"
@@ -58,10 +58,11 @@
         class="error">
         {{ errorShippingMethod }}
       </div>
-      <br>
+      <br><br>
     </div>
     <div
       v-if="showAddressFields">
+      <h3>Shipping Address</h3>
       <TextInput
         key="address-line-1"
         label="Address Line 1"
@@ -110,17 +111,17 @@
         v-bind:val.sync="postalCode"
         v-bind:error="errorPostalCode"
         v-bind:forceShowError="hasSubmitted" />
-      <br>
+      <br><br>
     </div>
     <div
       v-else-if="isMailSelected">
       If you'd like to order more than four items, you can select a "Pick up" method, or contact us at (EMAIL) if you would like a bulk order shipped to you.
-      <br><br>
+      <br><br><br>
     </div>
     <div
       v-else-if="shippingMethod">
       We will email you details about how to pick up your order once the order has been shipped to us.
-      <br><br>
+      <br><br><br>
     </div>
   </div>
 </template>
@@ -345,3 +346,42 @@ export default {
   }
 }
 </script>
+
+<style>
+.cart-form {
+  margin: 0 auto;
+  max-width: 500px;
+  /*padding: 0 1rem;*/
+  text-align: left;
+}
+
+.text-input label {
+  display: inline-block;
+  text-align: right;
+  width: 40%;
+}
+
+.text-input,
+.text-input .input-container {
+  text-align: left;
+}
+
+.text-input .input-container {
+  width: calc(60% - 0.5rem);
+}
+
+.text-input input {
+  max-width: 100%;
+  width: 100%;
+}
+
+.cart-form h3 {
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+input[type=radio] {
+  border: 1px solid #f00;
+  margin-left: 25%;
+}
+</style>

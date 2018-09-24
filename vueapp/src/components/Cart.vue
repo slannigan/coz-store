@@ -1,5 +1,5 @@
 <template>
-  <div class="cart container content-container">
+  <div class="cart content-container">
     <h2>Cart</h2>
     <div v-if="cart.length">
       <div class='cart-product'
@@ -36,7 +36,6 @@
         Total: {{ centsToDollars(totalCost) }}
       </div>
       <br>
-      <h4>Submission Form</h4>
       <CartForm
         v-bind:weight="weight"
         v-bind:isSubmitting="isSubmitting"
@@ -55,19 +54,21 @@
         </div>
         <br>
       </div>
-      <div
-        v-if="isSubmitting">
-        Submitting...
+      <div class='submitting-container'>
+        <div
+          v-if="isSubmitting">
+          Submitting...
+        </div>
+        <div
+          v-else-if="submittedSuccessfully" class='success'>
+          Success!
+        </div>
+        <button
+          v-else
+          v-on:click="triggerSubmit()">
+          Submit payment
+        </button>
       </div>
-      <div
-        v-else-if="submittedSuccessfully" class='success'>
-        Success!
-      </div>
-      <button
-        v-else
-        v-on:click="triggerSubmit()">
-        Submit payment
-      </button>
     </div>
     <div v-else>
       Your cart is empty.
@@ -207,13 +208,13 @@ export default {
 }
 </script>
 
-<style scoped>
-.container {
-  margin-top: 2rem;
-  max-width: calc(1024px - 2rem);
+<style>
+.cart {
+  margin: 2rem auto 0;
+  max-width: calc(100% - 3rem);
   padding: 1rem;
   text-align: left;
-  width: calc(100% - 2rem);
+  width: 600px;
 }
 
 .cart-product {
@@ -222,6 +223,10 @@ export default {
 }
 
 .total {
+  text-align: right;
+}
+
+.submitting-container {
   text-align: right;
 }
 

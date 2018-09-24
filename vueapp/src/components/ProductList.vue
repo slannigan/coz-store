@@ -1,9 +1,8 @@
 <template>
   <div class='container'>
-    <h2>Store</h2>
     <div class='product-list-container'>
-      <h3 v-if="showLoading">Loading...</h3>
-      <h3 v-else-if="error">
+      <h3 v-if="showLoading" class="content-container">Loading...</h3>
+      <h3 v-else-if="error" class="content-container">
         An error occurred. Please try again later, or contact us at support@citizenofzion.com if problems continue.
       </h3>
       <Product v-else

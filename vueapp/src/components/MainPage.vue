@@ -2,8 +2,10 @@
   <div class="main">
     <Nav
       v-bind:itemsInCart='cart.length' />
+      <img class='logo' src='/static/img/logo-large.png'>
     <ProductList
       v-on:add-to-cart='addToCart' />
+    <hr class='container'>
     <Cart
       v-bind:cart='cart'
       v-on:clear-cart='clearCart'
@@ -109,5 +111,11 @@ export default {
   background-position: center;
   background-size: cover;
   position: relative;
+}
+
+.logo {
+  margin-bottom: 2rem;
+  max-width: calc(100% - 4rem);
+  width: 500px;
 }
 </style>

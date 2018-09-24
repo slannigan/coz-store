@@ -1,7 +1,6 @@
 <template>
   <div class="nav">
     <div class='container'>
-      <h3>Citizen of Zion</h3>
       <h3>Cart: {{ itemsInCart }}</h3>
     </div>
   </div>
@@ -26,7 +25,6 @@ h3 {
 }
 
 .container {
-  display: flex;
-  justify-content: space-between;
+  text-align: right;
 }
 </style>

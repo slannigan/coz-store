@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class='stripe-container'>
+    <h3>Credit Card</h3>
     <div
       id="card-element"
       class="card-element stripe-input">
@@ -74,6 +75,12 @@ export default {
 </script>
 
 <style>
+.stripe-container {
+  margin: 0 auto;
+  max-width: 100%;
+  width: 500px;
+}
+
 .error {
   margin: 1rem 0;
 }
@@ -83,7 +90,11 @@ export default {
 }
 
 .card-element {
-  max-width: 600px;
   padding: 0.5rem 1rem;
+}
+
+.stripe-container h3 {
+  margin: 0 0 0.5rem;
+  padding: 0;
 }
 </style>

@@ -37,24 +37,23 @@ input[type=text],
 }
 
 .content-container {
-  background-color: rgba(255, 255, 255, 0.55);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.65);
+  box-shadow: inset 0 0px 50px rgba(255, 255, 255, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 input[type=text],
 .stripe-input {
   background-color: rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0px 2px #000;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
   transition: 0.3s;
 }
 
 input[type=text] {
   font-size: 0.8rem;
   padding: 0.25rem;
-}
-
-input[type=text]:focus {
-  background-color: rgba(255, 255, 255, 0.5);
 }
 
 .error {
@@ -77,5 +76,10 @@ button {
 
 button:hover {
   background: #a93131;
+}
+
+hr {
+  border-top: 1px solid rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 </style>
