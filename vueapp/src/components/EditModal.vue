@@ -4,8 +4,13 @@
     class="edit-modal-container">
     <div class="edit-modal"
       v-on:click="sink">
-      Set amount to charge: ({{ temp_cents_charged }})
-      <input v-model="temp_cents_charged">
+      <!-- Set amount to charge: ({{ temp_cents_charged }})
+      <input v-model="temp_cents_charged"> -->
+      <TextInput
+        v-bind:label="label"
+        v-bind:val.sync="tempCentsCharged"
+        v-bind:error="error"
+        v-bind:forceShowError="hasSubmitted" />
       <button v-on:click="submit()">
         Submit
       </button>
@@ -14,16 +19,31 @@
 </template>
 
 <script>
+import TextInput from './TextInput.vue';
 export default {
   name: 'EditModal',
+  components: {
+    TextInput
+  },
   props: {
     product: Object
   },
   data: function() {
     return {
-      error: '',
-      temp_cents_charged: ''
+      hasSubmitted: false,
+      tempCentsCharged: ''
     };
+  },
+  computed: {
+    error: function() {
+      const val = this.tempCentsCharged;
+      if (!val || !val.match(/^\s*\$?\d+(\.\d{0,2})?\s*$/)) {
+        return 'Must be a valid dollar amount.';
+      }
+    },
+    label: function() {
+      return `Set amount to charge for ${this.product.name}`;
+    }
   },
   methods: {
     cancel: function(e) {
@@ -33,13 +53,18 @@ export default {
       e.stopPropagation();
     },
     submit: function() {
-      const cents_charged = parseFloat(this.temp_cents_charged) * 100;
-      this.$emit('done-edit', cents_charged);
+      this.hasSubmitted = true;
+      if (!this.error) {
+        const input = this.tempCentsCharged.trim();
+        const dollars = input.indexOf('$') === 0 ? input.slice(1) : input;
+        const cents = parseFloat(dollars) * 100;
+        this.$emit('done-edit', cents);
+      }
     }
   },
   mounted() {
     if (this.product.cents_charged) {
-      this.temp_cents_charged = (this.product.cents_charged / 100).toFixed(2);
+      this.tempCentsCharged = (this.product.cents_charged / 100).toFixed(2);
     }
   }
 };

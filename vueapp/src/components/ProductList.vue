@@ -1,8 +1,11 @@
 <template>
   <div class='container'>
-    <h2>Product List</h2>
+    <h2>Store</h2>
     <div class='product-list-container'>
       <h3 v-if="showLoading">Loading...</h3>
+      <h3 v-else-if="error">
+        An error occurred. Please try again later, or contact us at support@citizenofzion.com if problems continue.
+      </h3>
       <Product v-else
         v-for="product in products"
         v-bind:key="product.id"
@@ -56,13 +59,13 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  text-align: left;
+.product-list-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.product-list-container {
-  border: 1px solid #0f0;
-  display: flex;
-  justify-content: space-between;
+h2 {
+  color: #fff;
 }
 </style>

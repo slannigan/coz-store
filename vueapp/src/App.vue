@@ -17,11 +17,11 @@ body {
 }
 
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #222;
 }
 
 .container {
@@ -30,9 +30,52 @@ body {
   width: 100%;
 }
 
+input[type=text],
+.stripe-input,
+.content-container {
+  border-radius: 2px;
+}
+
+.content-container {
+  background-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+input[type=text],
+.stripe-input {
+  background-color: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  transition: 0.3s;
+}
+
+input[type=text] {
+  font-size: 0.8rem;
+  padding: 0.25rem;
+}
+
+input[type=text]:focus {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
 .error {
-  background-color: #f00;
+  background-color: #eb1111;
   color: #fff;
   padding: 0.5rem 1rem;
+}
+
+button {
+  background: #8f2222;
+  border: 1px solid #6e0b0b;
+  border-radius: 2px;
+  box-shadow: inset 0 1px 0px #b74e4e;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #a93131;
 }
 </style>

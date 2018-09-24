@@ -1,18 +1,16 @@
 <template>
-  <div class="cart container">
+  <div class="cart container content-container">
     <h2>Cart</h2>
     <div v-if="cart.length">
       <div class='cart-product'
         v-for="product in cart">
         <div>
           <a
-            class='remove'
             tabindex='0'
             v-on:click="$emit('remove-from-cart', product)">
             (x)
           </a>
           <a
-            class='remove'
             v-if="!product.cents"
             v-on:click="$emit('edit-product', product)">
             (edit)
@@ -211,7 +209,6 @@ export default {
 
 <style scoped>
 .container {
-  border: 1px solid #f00;
   margin-top: 2rem;
   max-width: calc(1024px - 2rem);
   padding: 1rem;
@@ -228,8 +225,10 @@ export default {
   text-align: right;
 }
 
-.remove {
-  color: #0af;
+a,
+a:hover,
+a:focus {
+  color: #08d;
   cursor: pointer;
 }
 </style>

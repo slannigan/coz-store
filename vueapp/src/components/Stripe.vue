@@ -2,7 +2,7 @@
   <div>
     <div
       id="card-element"
-      class="card-element">
+      class="card-element stripe-input">
     </div>
     <div
       class="error"
@@ -83,7 +83,6 @@ export default {
 }
 
 .card-element {
-  border: 1px solid #f00;
   max-width: 600px;
   padding: 0.5rem 1rem;
 }

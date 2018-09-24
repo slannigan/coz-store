@@ -1,7 +1,7 @@
 <template>
   <div class="nav">
     <div class='container'>
-      <h3>Citizen of Zion Store</h3>
+      <h3>Citizen of Zion</h3>
       <h3>Cart: {{ itemsInCart }}</h3>
     </div>
   </div>
@@ -18,7 +18,7 @@ export default {
 
 <style scoped>
 .nav {
-  border-bottom: 1px solid #f00;
+  color: #fff;
 }
 
 h3 {

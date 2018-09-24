@@ -1,12 +1,16 @@
 <template>
-  <div class='product'>
-    <h4>{{ product.name }}</h4>
-    <div>{{ product.description }}</div>
-    <h4 v-if="product.cents">{{ cost }}</h4>
-    <button
-      v-on:click="$emit('add-to-cart')">
-      Add to cart
-    </button>
+  <div class='product content-container'>
+    <div>
+      <h3>{{ product.name }}</h3>
+      <div>{{ product.description }}</div>
+    </div>
+    <div>
+      <h4 v-if="product.cents">{{ cost }}</h4>
+      <button
+        v-on:click="$emit('add-to-cart')">
+        Add to cart
+      </button>
+    </div>
   </div>
 </template>
 
@@ -26,6 +30,14 @@ export default {
 
 <style scoped>
 .product {
-  border: 1px solid #00f;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0 0.5rem 1rem;
+  max-width: 100%;
+  padding: 0.5rem 0.5rem 1.5rem;
+  text-align: center;
+  transition: 0.3s;
+  width: 300px;
 }
 </style>

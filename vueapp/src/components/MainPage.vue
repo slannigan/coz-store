@@ -2,7 +2,6 @@
   <div class="main">
     <Nav
       v-bind:itemsInCart='cart.length' />
-    <h1>Main Page</h1>
     <ProductList
       v-on:add-to-cart='addToCart' />
     <Cart
@@ -14,12 +13,14 @@
       v-if='productToEdit'
       v-bind:product='productToEdit'
       v-on:done-edit='doneEdit' />
+    <Footer />
   </div>
 </template>
 
 <script>
 import Cart from './Cart.vue';
 import EditModal from './EditModal.vue';
+import Footer from './Footer.vue';
 import Nav from './Nav.vue';
 import ProductList from './ProductList.vue';
 
@@ -28,6 +29,7 @@ export default {
   components: {
     Cart,
     EditModal,
+    Footer,
     Nav,
     ProductList
   },
@@ -58,7 +60,7 @@ export default {
     doneEdit: function(newVal) {
       if (newVal) {
         const existsInCart = this.cart.indexOf(this.productToEdit) > -1;
-        this.productToEdit.cents_charged = newVal;
+        this.$set(this.productToEdit, 'cents_charged', newVal);
         if (!existsInCart) {
           this.cart.push(this.productToEdit);
         }
@@ -102,6 +104,10 @@ export default {
 
 <style>
 .main {
+  background-attachment: fixed;
+  background-image: url('/static/img/challenger.png');
+  background-position: center;
+  background-size: cover;
   position: relative;
 }
 </style>
