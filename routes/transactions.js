@@ -1,6 +1,7 @@
 const express = require('express');
 const { Pool } = require('pg');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const wrap = require('express-async-wrapper');
 
 const router = express.Router();
 const pool = new Pool({
@@ -8,7 +9,7 @@ const pool = new Pool({
   ssl: true
 });
 
-router.post('/transactions', async (req, res) => {
+router.post('/transactions', wrap(async (req, res, next) => {
   const amount = req.body.cents_charged_total;
   const cart = req.body.cart;
   let charge;
@@ -17,7 +18,7 @@ router.post('/transactions', async (req, res) => {
 
   try {
     client = await pool.connect();
-    validateTransaction(req.body, client);
+    await validateTransaction(req.body, client);
     await client.query('BEGIN');
     const transaction = await client.query(`
       INSERT INTO
@@ -70,14 +71,14 @@ router.post('/transactions', async (req, res) => {
       receipt_email: req.body.email,
       source: req.body.stripe_token.id
     });
+    // TODO: charge.outcome.risk_level === 'elevated' - should mark this in DB
     await client.query('COMMIT');
   } catch (e) {
     if (client) {
       await client.query('ROLLBACK');
       client.release();
     }
-    console.log('THROWING ERROR:', e);
-    return res.sendStatus(422);
+    return res.status(e.statusCode || 422).send(e.message || e);
   }
 
   try {
@@ -88,12 +89,11 @@ router.post('/transactions', async (req, res) => {
     `);
   } catch (e) {
     console.log('ERROR assigning charge id', charge.id, 'to transaction', transactionId);
-    res.sendStatus(422);
   } finally {
     client.release();
     res.sendStatus(201);
   }
-});
+}));
 
 const validateTransaction = async (vals, client) => {
   // Validate required text inputs

@@ -3,7 +3,8 @@
     <h3>Credit Card</h3>
     <div
       id="card-element"
-      class="card-element stripe-input">
+      class="card-element stripe-input"
+      v-bind:class="{ 'has-error': error }">
     </div>
     <div
       class="error"
@@ -31,11 +32,9 @@ export default {
       this.error = '';
       this.stripe.createToken(this.card).then((result) => {
         if (result.error) {
-          // Inform the customer that there was an error.
           this.error = result.error.message;
           this.$emit('cancel-submit');
         } else {
-          // Send the token to your server.
           this.$emit('set-stripe-token', result.token);
         }
       });
@@ -45,21 +44,15 @@ export default {
     this.stripe = Stripe('pk_test_SJaYyjJ2DRXChbLqHGD6YYA6');
     const elements = this.stripe.elements();
 
-    // Custom styling can be passed to options when creating an Element.
     const style = {
       base: {
-        // Add your base input styles here. For example:
         fontSize: '16px',
         color: "#32325d",
       }
     };
 
-    // Create an instance of the card Element.
     this.card = elements.create('card', { style });
-
-    // Add an instance of the card Element into the `card-element` <div>.
     this.card.mount('#card-element');
-
     this.card.addEventListener('change', (event) => {
       this.error = event.error ? event.error.message : '';
     });
@@ -82,7 +75,7 @@ export default {
 }
 
 .error {
-  margin: 1rem 0;
+  margin-top: 0.25rem;
 }
 
 .success {

@@ -105,6 +105,7 @@ export default {
       cartFormData: null,
       error: '',
       isMailing: false,
+      isSendingToAPI: false,
       isSubmitting: false,
       submittedSuccessfully: false,
       stripeToken: null
@@ -156,7 +157,10 @@ export default {
   },
   methods: {
     attemptSubmit: function() {
-      if (this.isSubmitting && this.stripeToken && this.cartFormData) {
+      if (!this.isSendingToAPI &&
+          this.isSubmitting &&
+          this.stripeToken &&
+          this.cartFormData) {
         this.submit();
       }
     },
@@ -187,6 +191,10 @@ export default {
       }
     },
     submit: function() {
+      if (this.isSendingToAPI) {
+        return;
+      }
+      this.isSendingToAPI = true;
       axios
         .post(`${process.env.API_URL}/transactions`, {
           address_line_1: this.cartFormData.address_line_1,
@@ -209,10 +217,12 @@ export default {
           this.submittedSuccessfully = true;
           this.$emit('clear-cart');
           this.isSubmitting = false;
+          this.isSendingToAPI = false;
         })
         .catch((error) => {
-          this.error = error;
+          this.error = error.response.data || error.response.statusText;
           this.isSubmitting = false;
+          this.isSendingToAPI = false;
         });
     },
     triggerSubmit: function() {

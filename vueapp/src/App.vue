@@ -66,7 +66,8 @@ input[type=text],
   transition: 0.3s;
 }
 
-input[type=text].has-error {
+input[type=text].has-error,
+.stripe-input.has-error {
   background-color: rgba(255, 200, 200, 0.5);
   box-shadow: 0 0px 2px #f00;
 }
