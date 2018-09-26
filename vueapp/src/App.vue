@@ -11,9 +11,24 @@ export default {
 </script>
 
 <style>
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0 0 0.5rem;
+  padding: 0;
+}
+
 body {
+  background-color: #000;
   margin: 0;
   padding: 0;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 #app {
@@ -51,20 +66,31 @@ input[type=text],
   transition: 0.3s;
 }
 
+input[type=text].has-error {
+  background-color: rgba(255, 200, 200, 0.5);
+  box-shadow: 0 0px 2px #f00;
+}
+
 input[type=text] {
   font-size: 0.8rem;
   padding: 0.25rem;
 }
 
+select {
+  margin-bottom: 0.25rem;
+}
+
 .error {
-  background-color: #eb1111;
+  background-color: #c80000;
   color: #fff;
+  font-size: 0.9rem;
   padding: 0.5rem 1rem;
+  text-align: center;
 }
 
 button {
   background: #8f2222;
-  border: 1px solid #6e0b0b;
+  border: 1px solid #3e060c;
   border-radius: 2px;
   box-shadow: inset 0 1px 0px #b74e4e;
   color: #fff;
@@ -79,7 +105,10 @@ button:hover {
 }
 
 hr {
-  border-top: 1px solid rgba(0, 0, 0, 0.5);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: none;
+  border-right: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.5);
+  max-width: 1024px;
 }
 </style>

@@ -46,11 +46,10 @@ export default {
       .get(`${process.env.API_URL}/products`)
       .then((response) => {
         this.products = response.data.products;
+        this.loading = false;
       })
       .catch((error) => {
         this.error = true;
-      })
-      .finally(() => {
         this.loading = false;
       });
   }

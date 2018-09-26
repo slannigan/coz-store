@@ -1,77 +1,90 @@
 <template>
   <div class="cart content-container">
-    <h2>Cart</h2>
-    <div v-if="cart.length">
-      <div class='cart-product'
-        v-for="product in cart">
-        <div>
-          <a
-            tabindex='0'
-            v-on:click="$emit('remove-from-cart', product)">
-            (x)
-          </a>
-          <a
-            v-if="!product.cents"
-            v-on:click="$emit('edit-product', product)">
-            (edit)
-          </a>
-          {{ product.name }}
+    <div class='cart-inner-container'>
+      <h3>Cart</h3>
+      <div v-if="cart.length">
+        <div class='cart-product'
+          v-for="product in cart">
+          <div class='left'>
+            <div
+              class='buttons-container'
+              v-bind:class="{ 'has-edit-button': hasEditButton }">
+              <button
+                v-if="!product.cents"
+                v-on:click="$emit('edit-product', product)">
+                Edit
+              </button>
+              <button
+                v-on:click="$emit('remove-from-cart', product)">
+                x
+              </button>
+            </div>
+            <div>
+              {{ product.name }}
+            </div>
+          </div>
+          <div>
+            {{ centsToDollars(product.cents_charged) }}
+          </div>
         </div>
-        <div>
-          {{ centsToDollars(product.cents_charged) }}
+        <div
+          v-if="chargedShippingCost"
+          class='cart-product'>
+          <div class='left'>
+            <div
+              class='buttons-container'
+              v-bind:class="{ 'has-edit-button': hasEditButton }">
+            </div>
+            <div>
+              Shipping:
+            </div>
+          </div>
+          <div>
+            {{ centsToDollars(chargedShippingCost) }}
+          </div>
         </div>
-      </div>
-      <div
-        v-if="chargedShippingCost"
-        class='cart-product'>
-        <div>
-          Shipping:
-        </div>
-        <div>
-          {{ centsToDollars(chargedShippingCost) }}
-        </div>
-      </div>
-      <hr>
-      <div class='total'>
-        Total: {{ centsToDollars(totalCost) }}
-      </div>
-      <br>
-      <CartForm
-        v-bind:weight="weight"
-        v-bind:isSubmitting="isSubmitting"
-        v-bind:shippingCost="centsToDollars(shippingCost)"
-        v-on:cancel-submit="cancelSubmit"
-        v-on:set-cart-form-data="setCartFormData"
-        v-on:set-is-mailing="setIsMailing" />
-      <Stripe
-        v-bind:isSubmitting="isSubmitting"
-        v-on:cancel-submit="cancelSubmit"
-        v-on:set-stripe-token="setStripeToken" />
-      <br>
-      <div v-if="error.length">
-        <div class='error'>
-          {{ error }}
+        <hr>
+        <div class='total'>
+          <h4>Total: {{ centsToDollars(totalCost) }}</h4>
         </div>
         <br>
-      </div>
-      <div class='submitting-container'>
-        <div
-          v-if="isSubmitting">
-          Submitting...
+        <CartForm
+          v-bind:weight="weight"
+          v-bind:isSubmitting="isSubmitting"
+          v-bind:shippingCost="centsToDollars(shippingCost)"
+          v-on:cancel-submit="cancelSubmit"
+          v-on:set-cart-form-data="setCartFormData"
+          v-on:set-is-mailing="setIsMailing" />
+        <Stripe
+          v-bind:isSubmitting="isSubmitting"
+          v-on:cancel-submit="cancelSubmit"
+          v-on:set-stripe-token="setStripeToken" />
+        <br>
+        <div v-if="error.length">
+          <div class='error'>
+            {{ error }}
+          </div>
+          <br>
         </div>
-        <div
-          v-else-if="submittedSuccessfully" class='success'>
-          Success!
+        <div class='submitting-container'>
+          <div
+            v-if="isSubmitting">
+            Submitting...
+          </div>
+          <div
+            v-else-if="submittedSuccessfully" class='success'>
+            Success!
+          </div>
+          <button
+            v-else
+            v-on:click="triggerSubmit()">
+            Submit payment
+          </button>
         </div>
-        <button
-          v-else
-          v-on:click="triggerSubmit()">
-          Submit payment
-        </button>
       </div>
-    </div>
-    <div v-else>
-      Your cart is empty.
+      <div v-else>
+        Your cart is empty.
+      </div>
     </div>
   </div>
 </template>
@@ -103,6 +116,9 @@ export default {
   computed: {
     chargedShippingCost: function() {
       return (this.isMailing && this.shippingCost) || 0;
+    },
+    hasEditButton: function() {
+      return !!this.cart.find((item) => !item.cents );
     },
     productsCost: function() {
       return this.cart.reduce((accumulator, currentVal) => {
@@ -192,11 +208,10 @@ export default {
           // this.products = response.data.products;
           this.submittedSuccessfully = true;
           this.$emit('clear-cart');
+          this.isSubmitting = false;
         })
         .catch((error) => {
           this.error = error;
-        })
-        .finally(() => {
           this.isSubmitting = false;
         });
     },
@@ -211,18 +226,49 @@ export default {
 <style>
 .cart {
   margin: 2rem auto 0;
-  max-width: calc(100% - 3rem);
-  padding: 1rem;
+  max-width: calc(100% - 2rem);
+  padding: 2rem 1rem;
   text-align: left;
   width: 600px;
 }
 
+.cart-inner-container {
+  margin: 0 auto;
+  max-width: 500px;
+}
+
 .cart-product {
+  align-items: baseline;
   display: flex;
   justify-content: space-between;
 }
 
+.cart-product:not(:last-child) {
+  margin-bottom: 0.25rem;
+}
+
+.cart-product .left {
+  align-items: center;
+  display: flex;
+}
+
+.buttons-container {
+  margin-right: 0.5rem;
+  min-width: 2rem;
+  text-align: right;
+}
+
+.buttons-container.has-edit-button {
+  min-width: 5rem;
+}
+
+.cart-product button {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
+}
+
 .total {
+  margin-top: 0.75rem;
   text-align: right;
 }
 

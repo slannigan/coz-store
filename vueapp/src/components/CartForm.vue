@@ -81,7 +81,11 @@
         v-bind:val.sync="city"
         v-bind:error="errorCity"
         v-bind:forceShowError="hasSubmitted" />
-      <label for="input-province">Province</label>
+      <label
+        for="input-province"
+        class="select-label">
+        Province
+      </label>
       <select
         id="input-province"
         v-model="province">
@@ -102,8 +106,10 @@
       </select>
       <div
         v-if="errorProvince"
-        class="error">
-        You must select a province.
+        class='select-error-container'>
+        <div class="error select-error">
+          You must select a province.
+        </div>
       </div>
       <TextInput
         key="postal-code"
@@ -351,11 +357,11 @@ export default {
 .cart-form {
   margin: 0 auto;
   max-width: 500px;
-  /*padding: 0 1rem;*/
   text-align: left;
 }
 
-.text-input label {
+.text-input label,
+.select-label {
   display: inline-block;
   text-align: right;
   width: 40%;
@@ -366,8 +372,19 @@ export default {
   text-align: left;
 }
 
-.text-input .input-container {
+.text-input .input-container,
+.text-input .error,
+.select-error {
   width: calc(60% - 0.5rem);
+}
+
+.error.select-error {
+  display: inline-block;
+  margin: 0.25rem 0 1rem;
+}
+
+.select-error-container {
+  text-align: right;
 }
 
 .text-input input {
@@ -381,7 +398,6 @@ export default {
 }
 
 input[type=radio] {
-  border: 1px solid #f00;
   margin-left: 25%;
 }
 </style>

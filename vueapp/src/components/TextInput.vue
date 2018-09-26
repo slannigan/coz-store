@@ -1,18 +1,23 @@
 <template>
   <!-- https://medium.com/front-end-hacking/vues-v-model-directive-vs-sync-modifier-d1f83957c57c -->
   <div class='text-input'>
-    <label>{{ label }}</label>
-    <div class='input-container'>
-      <input
-        type="text"
-        :value="val"
-        @input="$emit('update:val', $event.target.value)"
-        v-on:blur="setHasHadFocus"/>
+    <div>
+      <label>{{ label }}</label>
+      <div class='input-container'>
+        <input
+          type="text"
+          :value="val"
+          @input="$emit('update:val', $event.target.value)"
+          v-on:blur="setHasHadFocus"
+          v-bind:class="{ 'has-error': showError }" />
       </div>
+    </div>
     <div
       v-if="showError"
-      class='error'>
-      {{ error }}
+      class='error-container'>
+      <div class='error'>
+        {{ error }}
+      </div>
     </div>
   </div>
 </template>
@@ -44,12 +49,27 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .text-input {
   margin-bottom: 0.3rem;
 }
 
+.text-input > div:first-child {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
 .input-container {
   display: inline-block;
+}
+
+.error-container {
+  text-align: right;
+}
+
+.error {
+  display: inline-block;
+  margin-top: 0.25rem;
 }
 </style>

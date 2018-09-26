@@ -4,10 +4,8 @@
     class="edit-modal-container">
     <div class="edit-modal"
       v-on:click="sink">
-      <!-- Set amount to charge: ({{ temp_cents_charged }})
-      <input v-model="temp_cents_charged"> -->
       <TextInput
-        v-bind:label="label"
+        label="Set amount to donate:"
         v-bind:val.sync="tempCentsCharged"
         v-bind:error="error"
         v-bind:forceShowError="hasSubmitted" />
@@ -40,9 +38,6 @@ export default {
       if (!val || !val.match(/^\s*\$?\d+(\.\d{0,2})?\s*$/)) {
         return 'Must be a valid dollar amount.';
       }
-    },
-    label: function() {
-      return `Set amount to charge for ${this.product.name}`;
     }
   },
   methods: {
@@ -81,12 +76,16 @@ export default {
 
 .edit-modal {
   background: #fff;
-  border-radius: 1rem;
+  border-radius: 0.25rem;
   display: inline-block;
-  left: calc(50% - 20rem);
-  padding: 1rem;
-  position: fixed;
-  right: calc(50% - 20rem);
-  top: 15%;
+  margin: 15% auto;
+  max-width: calc(100% - 3rem);
+  padding: 2rem 1rem;
+  text-align: right;
+  width: 500px;
+}
+
+button {
+  margin-top: 0.5rem;
 }
 </style>

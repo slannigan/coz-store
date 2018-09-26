@@ -2,10 +2,11 @@
   <div class="main">
     <Nav
       v-bind:itemsInCart='cart.length' />
-      <img class='logo' src='/static/img/logo-large.png'>
+    <img class='logo' src='/static/img/logo-large.png'>
+    <Video />
     <ProductList
       v-on:add-to-cart='addToCart' />
-    <hr class='container'>
+    <hr>
     <Cart
       v-bind:cart='cart'
       v-on:clear-cart='clearCart'
@@ -25,6 +26,7 @@ import EditModal from './EditModal.vue';
 import Footer from './Footer.vue';
 import Nav from './Nav.vue';
 import ProductList from './ProductList.vue';
+import Video from './Video.vue';
 
 export default {
   name: 'MainPage',
@@ -33,7 +35,8 @@ export default {
     EditModal,
     Footer,
     Nav,
-    ProductList
+    ProductList,
+    Video
   },
   data: function() {
     return {

@@ -18,13 +18,20 @@ export default {
 <style scoped>
 .nav {
   color: #fff;
+  padding: 0.5rem;
 }
 
 h3 {
   display: inline-block;
+  margin: 0;
 }
 
 .container {
   text-align: right;
+}
+
+h3.coz {
+  color: #db052a;
+  text-shadow: 0px 0px 1px #fff;
 }
 </style>
