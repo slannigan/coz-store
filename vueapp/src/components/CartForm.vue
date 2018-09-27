@@ -121,7 +121,7 @@
     </div>
     <div
       v-else-if="isMailSelected">
-      If you'd like to order more than four items, you can select a "Pick up" method, or contact us at (EMAIL) if you would like a bulk order shipped to you.
+      If you'd like to order more than four items, you can select a "Pick up" method, or contact us at <a href='mailto:support@citizenofzion.com'>support@citizenofzion.com</a> if you would like a bulk order shipped to you.
       <br><br><br>
     </div>
     <div
@@ -327,7 +327,7 @@ export default {
     submit: function() {
       this.hasSubmitted = true;
       if (this.isMailSelected && !this.showAddressFields) {
-        this.$emit('cancel-submit', 'If you want to order in bulk, you must select a pickup location, or contact us at (EMAIL).');
+        this.$emit('cancel-submit', 'If you want to order in bulk, you must select a pickup location, or contact us at support@citizenofzion.com.');
       } else if (this.hasErrors) {
         this.$emit('cancel-submit');
       } else {

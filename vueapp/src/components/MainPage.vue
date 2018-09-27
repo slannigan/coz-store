@@ -12,16 +12,22 @@
       v-on:clear-cart='clearCart'
       v-on:remove-from-cart='removeFromCart'
       v-on:edit-product='editProduct' />
+    <hr>
+    <About />
+    <Contact />
+    <Footer />
+
     <EditModal
       v-if='productToEdit'
       v-bind:product='productToEdit'
       v-on:done-edit='doneEdit' />
-    <Footer />
   </div>
 </template>
 
 <script>
+import About from './About.vue';
 import Cart from './Cart.vue';
+import Contact from './Contact.vue';
 import EditModal from './EditModal.vue';
 import Footer from './Footer.vue';
 import Nav from './Nav.vue';
@@ -31,7 +37,9 @@ import Video from './Video.vue';
 export default {
   name: 'MainPage',
   components: {
+    About,
     Cart,
+    Contact,
     EditModal,
     Footer,
     Nav,
@@ -77,7 +85,10 @@ export default {
       this.productToEdit = product;
     },
     clearCart: function() {
-      this.cart = [];
+      while (this.cart.length) {
+        // Manually pop all cart elements, to be sure Vue notices array changes
+        this.cart.pop();
+      }
       this.updateLocalStorage();
     },
     removeFromCart: function(product) {

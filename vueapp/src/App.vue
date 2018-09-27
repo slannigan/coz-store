@@ -57,6 +57,19 @@ input[type=text],
   border-top: 1px solid rgba(255, 255, 255, 0.8);
 }
 
+.main-content-container {
+  margin: 2rem auto 0;
+  max-width: calc(100% - 2rem);
+  padding: 2rem 1rem;
+  text-align: left;
+  width: 600px;
+}
+
+.content-inner-container {
+  margin: 0 auto;
+  max-width: 500px;
+}
+
 input[type=text],
 .stripe-input {
   background-color: rgba(255, 255, 255, 0.3);
@@ -110,6 +123,7 @@ hr {
   border-left: none;
   border-right: none;
   border-top: 1px solid rgba(0, 0, 0, 0.5);
+  margin: 2rem auto;
   max-width: 1024px;
 }
 </style>

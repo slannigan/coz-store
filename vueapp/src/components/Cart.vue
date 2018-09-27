@@ -1,7 +1,7 @@
 <template>
-  <div class="cart content-container">
-    <div class='cart-inner-container'>
-      <h3>Cart</h3>
+  <div class="cart content-container main-content-container">
+    <div class='content-inner-container'>
+      <h3 id='cart'>Cart</h3>
       <div v-if="cart.length">
         <div class='cart-product'
           v-for="product in cart">
@@ -200,7 +200,6 @@ export default {
           address_line_1: this.cartFormData.address_line_1,
           address_line_2: this.cartFormData.address_line_2,
           cart: this.cart,
-          cents_charged_donation: 0, // TODO: add donation
           cents_charged_shipping: this.chargedShippingCost,
           cents_charged_total: this.totalCost,
           city: this.cartFormData.city,
@@ -227,6 +226,13 @@ export default {
     },
     triggerSubmit: function() {
       this.error = '';
+      const donation = this.cart.find((item) => item.slug === 'donation');
+      if (donation && donation.cents_charged > 10000) {
+        const confirmDonation = confirm(`$${(donation.cents_charged / 100).toFixed(2)} is a generous donation! Click OK to confirm.`);
+        if (!confirmDonation) {
+          return;
+        }
+      }
       this.isSubmitting = true;
     }
   }
@@ -234,19 +240,6 @@ export default {
 </script>
 
 <style>
-.cart {
-  margin: 2rem auto 0;
-  max-width: calc(100% - 2rem);
-  padding: 2rem 1rem;
-  text-align: left;
-  width: 600px;
-}
-
-.cart-inner-container {
-  margin: 0 auto;
-  max-width: 500px;
-}
-
 .cart-product {
   align-items: baseline;
   display: flex;
@@ -258,7 +251,7 @@ export default {
 }
 
 .cart-product .left {
-  align-items: center;
+  align-items: baseline;
   display: flex;
 }
 
@@ -286,10 +279,8 @@ export default {
   text-align: right;
 }
 
-a,
-a:hover,
-a:focus {
-  color: #08d;
-  cursor: pointer;
+.cart hr {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 </style>

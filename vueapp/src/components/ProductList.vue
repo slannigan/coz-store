@@ -1,8 +1,8 @@
 <template>
   <div class='container'>
-    <div class='product-list-container'>
-      <h3 v-if="showLoading" class="content-container">Loading...</h3>
-      <h3 v-else-if="error" class="content-container">
+    <div id='shop' class='product-list-container'>
+      <h3 v-if="showLoading" class="empty-container content-container">Loading...</h3>
+      <h3 v-else-if="error" class="empty-container content-container">
         An error occurred. Please try again later, or contact us at support@citizenofzion.com if problems continue.
       </h3>
       <Product v-else
@@ -61,6 +61,12 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+.empty-container {
+  padding: 1rem;
+  margin: 0 1rem;
+  max-width: 500px;
 }
 
 h2 {

@@ -78,7 +78,13 @@ router.post('/transactions', wrap(async (req, res, next) => {
       await client.query('ROLLBACK');
       client.release();
     }
-    return res.status(e.statusCode || 422).send(e.message || e);
+    // If the error is a string, it's one we've manually thrown. If statusCode exists,
+    //  it's a Stripe error. In both of those cases, send out the given error message.
+    if (typeof(e) === 'string' || !!e.statusCode) {
+      return res.status(e.statusCode || 422).send(e.message || e);
+    }
+    // Otherwise, send out a generic error.
+    return res.status(422).send('An error occurred. You did not get charged. Please try again later.');
   }
 
   try {
