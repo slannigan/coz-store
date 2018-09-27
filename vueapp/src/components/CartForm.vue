@@ -126,7 +126,7 @@
     </div>
     <div
       v-else-if="shippingMethod">
-      We will email you details about how to pick up your order once the order has been shipped to us.
+      We will email you details about how to pick up your order once it has been shipped to us.
       <br><br><br>
     </div>
   </div>
@@ -165,6 +165,9 @@ export default {
         }, {
           isValid: this.lessThan(255),
           message: 'Address is too long.'
+        }, {
+          isValid: this.usesLegalLettersOrNumbers,
+          message: 'Can only use letters, numbers, commas, colons, periods, #, or spaces.'
         }
       ],
       validationsAddressLine2: [
@@ -173,6 +176,9 @@ export default {
             return this.val ? this.val.length < 255 : true;
           },
           message: 'Address line 2 is too long.'
+        }, {
+          isValid: this.usesLegalLettersOrNumbers,
+          message: 'Can only use letters, numbers, commas, colons, periods, #, or spaces.'
         }
       ],
       validationsCity: [
@@ -182,6 +188,9 @@ export default {
         }, {
           isValid: this.lessThan(32),
           message: 'City is too long.'
+        }, {
+          isValid: this.usesLegalLettersOrNumbers,
+          message: 'Can only use letters, numbers, commas, colons, periods, #, or spaces.'
         }
       ],
       validationsEmail: [
@@ -206,6 +215,9 @@ export default {
         }, {
           isValid: this.lessThan(32),
           message: 'First name is too long.'
+        }, {
+          isValid: this.usesLegalLetters,
+          message: 'Can only use letters, commas, periods, or spaces.'
         }
       ],
       validationsLastName: [
@@ -215,6 +227,9 @@ export default {
         }, {
           isValid: this.lessThan(32),
           message: 'Last name is too long.'
+        }, {
+          isValid: this.usesLegalLetters,
+          message: 'Can only use letters, commas, periods, or spaces.'
         }
       ],
       validationsPostalCode: [
@@ -275,7 +290,8 @@ export default {
         data.city = this.city;
         data.province = this.province;
         data.postal_code = this.postalCode;
-      } else if (this.showShippingMethods) {
+      }
+      if (this.showShippingMethods) {
         data.pickup_location = this.shippingMethod;
       }
       return data;
@@ -333,6 +349,12 @@ export default {
       } else {
         this.$emit('set-cart-form-data', this.formData);
       }
+    },
+    usesLegalLetters: function(val) {
+      return !val || val.match(/^([a-zA-Z]+[\., ]*)+$/);
+    },
+    usesLegalLettersOrNumbers: function(val) {
+      return !val || val.match(/^(#*[a-zA-Z\d]+[\.,: ]*)+$/);
     }
   },
   watch: {

@@ -1,8 +1,8 @@
 <template>
   <div
     v-on:click="cancel"
-    class="edit-modal-container">
-    <div class="edit-modal"
+    class="modal-container">
+    <div class="modal"
       v-on:click="sink">
       <TextInput
         label="Set amount to donate:"
@@ -64,28 +64,3 @@ export default {
   }
 };
 </script>
-
-<style>
-.edit-modal-container {
-  background: rgba(0, 0, 0, 0.5);
-  height: 100%;
-  position: fixed;
-  top: 0;
-  width: 100%;
-}
-
-.edit-modal {
-  background: #fff;
-  border-radius: 0.25rem;
-  display: inline-block;
-  margin: 15% auto;
-  max-width: calc(100% - 3rem);
-  padding: 2rem 1rem;
-  text-align: right;
-  width: 500px;
-}
-
-button {
-  margin-top: 0.5rem;
-}
-</style>

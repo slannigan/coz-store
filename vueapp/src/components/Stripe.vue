@@ -78,10 +78,6 @@ export default {
   margin-top: 0.25rem;
 }
 
-.success {
-  color: #0f4;
-}
-
 .card-element {
   padding: 0.5rem 1rem;
 }

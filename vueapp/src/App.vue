@@ -111,11 +111,18 @@ button {
   cursor: pointer;
   font-size: 1rem;
   padding: 0.5rem 1rem;
-  transition: background 0.3s;
+  transition: 0.3s;
 }
 
 button:hover {
   background: #a93131;
+}
+
+button:disabled {
+  background: #575757;
+  border: 1px solid #262626;
+  box-shadow: none;
+  cursor: default;
 }
 
 hr {
@@ -125,5 +132,30 @@ hr {
   border-top: 1px solid rgba(0, 0, 0, 0.5);
   margin: 2rem auto;
   max-width: 1024px;
+}
+
+.modal-container {
+  background: rgba(0, 0, 0, 0.5);
+  height: 100%;
+  left: 0;
+  position: fixed;
+  text-align: center;
+  top: 0;
+  width: 100%;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 0.25rem;
+  display: inline-block;
+  margin: 15% auto;
+  max-width: calc(100% - 3rem);
+  padding: 2rem 1rem;
+  text-align: right;
+  width: 500px;
+}
+
+.modal button {
+  margin-top: 0.5rem;
 }
 </style>

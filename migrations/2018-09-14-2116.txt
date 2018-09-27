@@ -9,12 +9,11 @@ create table transactions (
   province varchar(2),
   postal_code text,
   stripe_charge_id text,
+  fraud_risk boolean,
   cents_charged_shipping integer NOT NULL DEFAULT 0,
   cents_charged_total integer NOT NULL,
   created_at timestamptz NOT NULL DEFAULT NOW()
 );
-
-alter table products add primary key(id);
 
 create table purchased_items (
   id SERIAL PRIMARY KEY,

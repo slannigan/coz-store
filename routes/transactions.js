@@ -10,8 +10,6 @@ const pool = new Pool({
 });
 
 router.post('/transactions', wrap(async (req, res, next) => {
-  const amount = req.body.cents_charged_total;
-  const cart = req.body.cart;
   let charge;
   let client;
   let transactionId;
@@ -31,7 +29,6 @@ router.post('/transactions', wrap(async (req, res, next) => {
           city,
           province,
           postal_code,
-          stripe_charge_id,
           cents_charged_shipping,
           cents_charged_total
         )
@@ -44,7 +41,6 @@ router.post('/transactions', wrap(async (req, res, next) => {
           '${(req.body.city || '').trim()}',
           '${(req.body.province || '')}',
           '${(req.body.postal_code || '').toUpperCase().trim()}',
-          '${req.body.stripe_token.id}',
           ${req.body.cents_charged_shipping},
           ${req.body.cents_charged_total}
         )
@@ -64,20 +60,35 @@ router.post('/transactions', wrap(async (req, res, next) => {
         )
         VALUES ${purchasedItemsStr}
     `);
+    const itemsByCount = [];
+    req.body.cart.forEach((item) => {
+      let objForItem = itemsByCount.find((obj) => obj.name === item.name);
+      if (!objForItem) {
+        itemsByCount.push({
+          count: 1,
+          name: item.name
+        });
+      } else {
+        objForItem.count++;
+      }
+    });
+    const description = itemsByCount.map((obj) => {
+      return `${obj.count}x ${obj.name}`;
+    }).join(', ');
     charge = await stripe.charges.create({
-      amount,
+      amount: req.body.cents_charged_total,
       currency: 'cad',
-      description: 'Example charge',
+      description,
       receipt_email: req.body.email,
       source: req.body.stripe_token.id
     });
-    // TODO: charge.outcome.risk_level === 'elevated' - should mark this in DB
     await client.query('COMMIT');
   } catch (e) {
     if (client) {
       await client.query('ROLLBACK');
       client.release();
     }
+    console.error('Error in POST/transactions. Body:', req.body, ', Error:', e);
     // If the error is a string, it's one we've manually thrown. If statusCode exists,
     //  it's a Stripe error. In both of those cases, send out the given error message.
     if (typeof(e) === 'string' || !!e.statusCode) {
@@ -90,11 +101,13 @@ router.post('/transactions', wrap(async (req, res, next) => {
   try {
     await client.query(`
       UPDATE transactions
-        SET stripe_charge_id = '${charge.id}'
+        SET
+          stripe_charge_id = '${charge.id}',
+          fraud_risk = ${(charge.outcome.risk_level !== 'normal')}
         WHERE id = ${transactionId}
     `);
   } catch (e) {
-    console.log('ERROR assigning charge id', charge.id, 'to transaction', transactionId);
+    console.error('Error in POST/transactions. Body:', req.body, ', Error:', e);
   } finally {
     client.release();
     res.sendStatus(201);
@@ -141,7 +154,8 @@ const validateTransaction = async (vals, client) => {
       id,
       slug,
       grams,
-      cents
+      cents,
+      name
     FROM products
     WHERE id IN (${productIds.join(', ')});
   `);
@@ -154,7 +168,8 @@ const validateTransaction = async (vals, client) => {
     }
     if ((savedProduct.slug !== item.slug) ||
         (savedProduct.grams !== item.grams) ||
-        (savedProduct.cents !== item.cents)) {
+        (savedProduct.cents !== item.cents) ||
+        (savedProduct.name !== item.name)) {
       throw 'A cart item\'s data does not match the item in the database.';
     }
   });

@@ -67,18 +67,14 @@
           <br>
         </div>
         <div class='submitting-container'>
-          <div
+          <button disabled
             v-if="isSubmitting">
             Submitting...
-          </div>
-          <div
-            v-else-if="submittedSuccessfully" class='success'>
-            Success!
-          </div>
+          </button>
           <button
             v-else
             v-on:click="triggerSubmit()">
-            Submit payment
+            Submit payment ({{ centsToDollars(totalCost) }})
           </button>
         </div>
       </div>
@@ -86,17 +82,23 @@
         Your cart is empty.
       </div>
     </div>
+    <AlertModal
+      v-if="successAlertMessage"
+      v-bind:text="successAlertMessage"
+      v-on:close="closeSuccessMessage" />
   </div>
 </template>
 
 <script>
-import Stripe from './Stripe.vue';
+import AlertModal from './AlertModal.vue';
 import CartForm from './CartForm.vue';
+import Stripe from './Stripe.vue';
 const axios = require('axios');
 
 export default {
   name: 'Cart',
   components: {
+    AlertModal,
     CartForm,
     Stripe
   },
@@ -107,7 +109,7 @@ export default {
       isMailing: false,
       isSendingToAPI: false,
       isSubmitting: false,
-      submittedSuccessfully: false,
+      successEmail: '',
       stripeToken: null
     }
   },
@@ -144,6 +146,11 @@ export default {
         return (2 * envelopeCost) + (2 * shippingFor300To400Grams);
       }
     },
+    successAlertMessage: function() {
+      if (this.successEmail) {
+        return `Your payment has been received! A receipt has been sent to ${this.successEmail}.`;
+      }
+    },
     totalCost: function() {
       return this.productsCost + (this.chargedShippingCost || 0);
     },
@@ -174,6 +181,9 @@ export default {
       if (cents) {
         return `$${(cents / 100).toFixed(2)}`;
       }
+    },
+    closeSuccessMessage: function() {
+      this.successEmail = null;
     },
     setCartFormData: function(data) {
       if (this.isSubmitting) {
@@ -213,7 +223,7 @@ export default {
         })
         .then((response) => {
           // this.products = response.data.products;
-          this.submittedSuccessfully = true;
+          this.successEmail = this.cartFormData.email;
           this.$emit('clear-cart');
           this.isSubmitting = false;
           this.isSendingToAPI = false;
