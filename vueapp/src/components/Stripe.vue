@@ -41,7 +41,7 @@ export default {
     }
   },
   mounted() {
-    this.stripe = Stripe('pk_test_SJaYyjJ2DRXChbLqHGD6YYA6');
+    this.stripe = Stripe(process.env.STRIPE_KEY);
     const elements = this.stripe.elements();
 
     const style = {

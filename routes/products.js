@@ -15,8 +15,8 @@ router.get('/products', async (req, res) => {
     client.release();
     res.send(results);
   } catch (err) {
-    console.error(err);
-    res.send("Error " + err);
+    console.error('Unexpected error in GET/products. Error:', err);
+    res.sendStatus(422);
   }
 });
 

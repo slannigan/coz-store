@@ -65,6 +65,7 @@ router.post('/transactions', wrap(async (req, res, next) => {
       let objForItem = itemsByCount.find((obj) => obj.name === item.name);
       if (!objForItem) {
         itemsByCount.push({
+          cents: item.cents_charged,
           count: 1,
           name: item.name
         });
@@ -72,15 +73,18 @@ router.post('/transactions', wrap(async (req, res, next) => {
         objForItem.count++;
       }
     });
-    const description = itemsByCount.map((obj) => {
-      return `${obj.count}x ${obj.name}`;
-    }).join(', ');
+    let description = itemsByCount.map((obj) => {
+      return `${obj.count}x ${obj.name} ($${(obj.count * obj.cents / 100).toFixed(2)})`;
+    }).join('\n');
+    if (req.body.cents_charged_shipping) {
+      description += `\nShipping ($${(req.body.cents_charged_shipping / 100).toFixed(2)})`;
+    }
     charge = await stripe.charges.create({
       amount: req.body.cents_charged_total,
       currency: 'cad',
       description,
       receipt_email: req.body.email,
-      source: req.body.stripe_token.id
+      source: req.body.stripe_token_id
     });
     await client.query('COMMIT');
   } catch (e) {
@@ -88,13 +92,14 @@ router.post('/transactions', wrap(async (req, res, next) => {
       await client.query('ROLLBACK');
       client.release();
     }
-    console.error('Error in POST/transactions. Body:', req.body, ', Error:', e);
     // If the error is a string, it's one we've manually thrown. If statusCode exists,
     //  it's a Stripe error. In both of those cases, send out the given error message.
     if (typeof(e) === 'string' || !!e.statusCode) {
+      console.error('Error in POST/transactions. Body:', req.body, ', Error:', e);
       return res.status(e.statusCode || 422).send(e.message || e);
     }
     // Otherwise, send out a generic error.
+    console.error('Unexpected error in POST/transactions. Body:', req.body, ', Error:', e);
     return res.status(422).send('An error occurred. You did not get charged. Please try again later.');
   }
 
@@ -107,7 +112,7 @@ router.post('/transactions', wrap(async (req, res, next) => {
         WHERE id = ${transactionId}
     `);
   } catch (e) {
-    console.error('Error in POST/transactions. Body:', req.body, ', Error:', e);
+    console.error('Unexpected error in POST/transactions. Body:', req.body, ', Error:', e);
   } finally {
     client.release();
     res.sendStatus(201);
@@ -132,9 +137,9 @@ const validateTransaction = async (vals, client) => {
   validate(vals.email, v.lessThan(255), 'Email is too long.');
 
   // Validate other required values
-  validate(vals.stripe_token, v.required, 'Stripe token is required.');
-  validate(vals.stripe_token.id, v.required, 'Stripe token id is required.');
-  validate(vals.stripe_token.id, v.isString, 'Stripe token id is invalid.');
+  validate(vals.stripe_token_id, v.required, 'Stripe token is required.');
+  validate(vals.stripe_token_id, v.required, 'Stripe token id is required.');
+  validate(vals.stripe_token_id, v.isString, 'Stripe token id is invalid.');
 
   validate(vals.cents_charged_total, v.required, 'Total cost is required.');
   validate(vals.cents_charged_total, v.isNumGt0, 'Total cost must be a number greater than zero.');

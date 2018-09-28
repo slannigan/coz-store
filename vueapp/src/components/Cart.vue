@@ -219,7 +219,7 @@ export default {
           pickup_location: this.cartFormData.pickup_location,
           postal_code: this.cartFormData.postal_code,
           province: this.cartFormData.province,
-          stripe_token: this.stripeToken
+          stripe_token_id: this.stripeToken.id
         })
         .then((response) => {
           // this.products = response.data.products;
