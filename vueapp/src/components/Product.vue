@@ -6,7 +6,7 @@
     </div>
     <div>
       <div>
-        <img src='http://www.theactionbible.com/wp-content/uploads/action-bible-product-esv-girl-3d.png' />
+        <img v-bind:src="imgSrc" />
       </div>
       <h4 v-if="product.cents">{{ cost }}</h4>
       <button
@@ -26,8 +26,30 @@ export default {
   computed: {
     cost: function() {
       return `$${(this.product.cents / 100).toFixed(2)}`;
+    },
+    imgSrc: function() {
+      const cd = require('../assets/img/fl-live-cd.png');
+      const cdAndDvd = require('../assets/img/fl-live-cd-dvd.png');
+      // const donation = require('../assets/img/donation.png');
+      const dvd = require('../assets/img/fl-live-dvd.png');
+      const mp3s = require('../assets/img/fl-live-mp3s.png');
+      switch(this.product.slug) {
+        case 'fl-live-mp3s':
+          return mp3s;
+        case 'fl-live-cd':
+          return cd;
+        case 'fl-live-dvd':
+          return dvd;
+        case 'fl-live-cd-dvd':
+          return cdAndDvd;
+        // case 'donation':
+        //   return donation;
+        default:
+          return 'http://www.theactionbible.com/wp-content/uploads/action-bible-product-esv-girl-3d.png';
+      }
+      return cd;
     }
-  },
+  }
 };
 </script>
 
