@@ -8,7 +8,9 @@
       <div>
         <img v-bind:src="imgSrc" />
       </div>
-      <h4 v-if="product.cents">{{ cost }}</h4>
+      <div class='cost-container'>
+        <h4 v-if="product.cents">{{ cost }}</h4>
+      </div>
       <button
         v-on:click="$emit('add-to-cart')">
         Add to cart
@@ -30,7 +32,7 @@ export default {
     imgSrc: function() {
       const cd = require('../assets/img/fl-live-cd.png');
       const cdAndDvd = require('../assets/img/fl-live-cd-dvd.png');
-      // const donation = require('../assets/img/donation.png');
+      const donation = require('../assets/img/donation.png');
       const dvd = require('../assets/img/fl-live-dvd.png');
       const mp3s = require('../assets/img/fl-live-mp3s.png');
       switch(this.product.slug) {
@@ -42,10 +44,8 @@ export default {
           return dvd;
         case 'fl-live-cd-dvd':
           return cdAndDvd;
-        // case 'donation':
-        //   return donation;
-        default:
-          return 'http://www.theactionbible.com/wp-content/uploads/action-bible-product-esv-girl-3d.png';
+        case 'donation':
+          return donation;
       }
       return cd;
     }
@@ -70,5 +70,9 @@ img {
   height: 8rem;
   margin: 1rem auto;
   max-width: 100%;
+}
+
+.cost-container {
+  min-height: 1.5rem;
 }
 </style>
