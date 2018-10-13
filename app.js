@@ -12,6 +12,7 @@ const HOST = process.env.HOST || `localhost:${PORT}`;
 
 // Require routes
 const products = require('./routes/products');
+const promoCodes = require('./routes/promoCodes');
 const transactions = require('./routes/transactions');
 
 // If not doing local development, redirect http to https
@@ -38,6 +39,7 @@ app.use(bodyParser.json());
 
 // Import routes
 app.use('/api/', products);
+app.use('/api/', promoCodes);
 app.use('/api/', transactions);
 
 // Start server

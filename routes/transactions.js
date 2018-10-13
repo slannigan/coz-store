@@ -16,7 +16,8 @@ router.post('/transactions', wrap(async (req, res, next) => {
 
   try {
     client = await pool.connect();
-    await validateTransaction(req.body, client);
+    const promoCode = await validatePromoCode(req.body.promo_code, req.body.email, client);
+    await validateTransaction(req.body, promoCode, client);
     await client.query('BEGIN');
     const transaction = await client.query(`
       INSERT INTO
@@ -30,6 +31,7 @@ router.post('/transactions', wrap(async (req, res, next) => {
           province,
           postal_code,
           cents_charged_shipping,
+          promo_code_id,
           cents_charged_total
         )
         VALUES (
@@ -42,6 +44,7 @@ router.post('/transactions', wrap(async (req, res, next) => {
           '${(req.body.province || '')}',
           '${(req.body.postal_code || '').toUpperCase().trim()}',
           ${req.body.cents_charged_shipping},
+          ${promoCode ? promoCode.id : null},
           ${req.body.cents_charged_total}
         )
         RETURNING id
@@ -76,6 +79,18 @@ router.post('/transactions', wrap(async (req, res, next) => {
     let description = itemsByCount.map((obj) => {
       return `${obj.count}x ${obj.name} ($${(obj.count * obj.cents / 100).toFixed(2)})`;
     }).join('\n');
+    if (promoCode) {
+      let percentOff;
+      if (promoCode.product_slug) {
+        const product = req.body.cart.find((obj) => obj.slug === promoCode.product_slug);
+        if (product) {
+          percentOff = `${promoCode.percent_off}% off ${product.name}`;
+        }
+      } else {
+        percentOff = `${promoCode.percent_off}% off all items`;
+      }
+      description += `\nPromo code ${req.body.promo_code.toUpperCase()} (${percentOff})`;
+    }
     if (req.body.cents_charged_shipping) {
       description += `\nShipping ($${(req.body.cents_charged_shipping / 100).toFixed(2)})`;
     }
@@ -119,7 +134,36 @@ router.post('/transactions', wrap(async (req, res, next) => {
   }
 }));
 
-const validateTransaction = async (vals, client) => {
+const validatePromoCode = async (code, email, client) => {
+  if (code) {
+    let result = await client.query(`
+      SELECT
+        id,
+        product_slug,
+        percent_off
+      FROM promo_codes
+        WHERE code = '${code.toLowerCase()}'
+          AND expired_at IS NULL;
+    `);
+    const promoCode = result.rows[0];
+    if (!promoCode) {
+      throw `Promo code '${code.toUpperCase()}' does not exist.`;
+    }
+    result = await client.query(`
+      SELECT EXISTS (
+        SELECT * FROM transactions
+          WHERE promo_code_id = ${promoCode.id}
+            AND email = '${email}'
+      )
+    `);
+    if (result && result.rows && result.rows[0] && result.rows[0].exists) {
+      throw 'You have already used this promo code before.';
+    }
+    return promoCode;
+  }
+};
+
+const validateTransaction = async (vals, promoCode, client) => {
   // Validate required text inputs
   validate(vals.first_name, v.required, 'First name is required.');
   validate(vals.first_name, v.isString, 'First name does not have the correct format.');
@@ -257,8 +301,28 @@ const validateTransaction = async (vals, client) => {
   const totalItemCost = vals.cart.reduce((accumulator, currentVal) => {
     return accumulator + currentVal.cents_charged;
   }, 0);
-  if (vals.cents_charged_total !== (vals.cents_charged_shipping + totalItemCost)) {
-    throw 'Total cost does not match the cost of the cart items plus shipping plus donation.';
+  let promoCodeAmountOff = 0;
+  if (promoCode) {
+    const percentOff = promoCode.percent_off / 100;
+    if (promoCode.product_slug) {
+      const product = vals.cart.find((obj) => obj.slug === promoCode.product_slug);
+      if (product) {
+        promoCodeAmountOff = Math.floor(product.cents * percentOff);
+      }
+    } else {
+      promoCodeAmountOff = Math.floor(totalItemCost * percentOff);
+    }
+  }
+  if (vals.cents_charged_total !== (vals.cents_charged_shipping + totalItemCost - promoCodeAmountOff)) {
+    let error = 'Total cost does not match the cost of the cart items';
+    if (promoCodeAmountOff) {
+      error += ' plus discount';
+    }
+    if (vals.cents_charged_shipping) {
+      error += ' plus shipping';
+    }
+    error += '.';
+    throw error;
   }
 };
 

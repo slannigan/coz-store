@@ -1,3 +1,12 @@
+create table promo_codes (
+  id SERIAL PRIMARY KEY,
+  code text NOT NULL,
+  product_slug text,
+  percent_off integer NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT NOW(),
+  expired_at timestamptz
+);
+
 create table transactions (
   id SERIAL PRIMARY KEY,
   first_name varchar(32) NOT NULL,
@@ -11,6 +20,7 @@ create table transactions (
   stripe_charge_id text,
   fraud_risk boolean,
   cents_charged_shipping integer NOT NULL DEFAULT 0,
+  promo_code_id integer REFERENCES promo_codes(id),
   cents_charged_total integer NOT NULL,
   created_at timestamptz NOT NULL DEFAULT NOW()
 );

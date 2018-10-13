@@ -28,6 +28,30 @@
           </div>
         </div>
         <div
+          v-if="promoCode"
+          class='cart-product'>
+          <div class='left'>
+            <div
+              class='buttons-container'
+              v-bind:class="{ 'has-edit-button': hasEditButton }">
+              <button
+                v-on:click="editPromoCode">
+                Edit
+              </button>
+              <button
+                v-on:click="setPromoCode">
+                x
+              </button>
+            </div>
+            <div>
+              {{ promoCode.code.toUpperCase() }}: {{ promoCode.percent_off }}% off {{ promoCode.product_slug ? (promoCodeProduct && promoCodeProduct.name || promoCode.product_slug) : '' }}
+            </div>
+          </div>
+          <div>
+            -{{ centsToDollars(promoCodeCentsOff) || '$0.00' }}
+          </div>
+        </div>
+        <div
           v-if="chargedShippingCost"
           class='cart-product'>
           <div class='left'>
@@ -46,6 +70,10 @@
         <hr>
         <div class='total'>
           <h4>Total: {{ centsToDollars(totalCost) }}</h4>
+          <button
+            v-on:click="editPromoCode">
+            {{ promoCodeBtnText }}
+          </button>
         </div>
         <br>
         <CartForm
@@ -86,12 +114,18 @@
       v-if="successAlertMessage"
       v-bind:text="successAlertMessage"
       v-on:close="closeSuccessMessage" />
+    <PromoCodeModal
+      v-if="isEditingPromoCode"
+      v-bind:promoCode="promoCode"
+      v-on:cancel-edit="cancelEditPromoCode"
+      v-on:set-promo-code="setPromoCode" />
   </div>
 </template>
 
 <script>
 import AlertModal from './AlertModal.vue';
 import CartForm from './CartForm.vue';
+import PromoCodeModal from './PromoCodeModal.vue';
 import Stripe from './Stripe.vue';
 const axios = require('axios');
 
@@ -100,21 +134,26 @@ export default {
   components: {
     AlertModal,
     CartForm,
+    PromoCodeModal,
     Stripe
   },
   data: function() {
     return {
       cartFormData: null,
       error: '',
+      isEditingPromoCode: false,
+      isLocalStorageAvailable: false,
       isMailing: false,
       isSendingToAPI: false,
       isSubmitting: false,
+      promoCode: null,
       successEmail: '',
       stripeToken: null
     }
   },
   props: {
-    cart: Array
+    cart: Array,
+    products: Array
   },
   computed: {
     chargedShippingCost: function() {
@@ -127,6 +166,29 @@ export default {
       return this.cart.reduce((accumulator, currentVal) => {
         return accumulator + currentVal.cents_charged;
       }, 0);
+    },
+    promoCodeBtnText: function() {
+      if (this.promoCode) {
+        return 'Change promo code';
+      }
+      return 'Apply promo code';
+    },
+    promoCodeCentsOff: function() {
+      if (this.promoCode) {
+        const percentOff = this.promoCode.percent_off / 100;
+        if (this.promoCode.product_slug) {
+          if (this.promoCodeProduct) {
+            return Math.floor(this.promoCodeProduct.cents_charged * percentOff);
+          }
+          return 0;
+        }
+        return Math.floor(this.productsCost * percentOff);
+      }
+    },
+    promoCodeProduct: function() {
+      if (this.promoCode && this.promoCode.product_slug) {
+        return this.products.find((obj) => obj.slug === this.promoCode.product_slug);
+      }
     },
     shippingCost: function() {
       const weight = this.weight;
@@ -152,7 +214,7 @@ export default {
       }
     },
     totalCost: function() {
-      return this.productsCost + (this.chargedShippingCost || 0);
+      return this.productsCost - (this.promoCodeCentsOff || 0) + (this.chargedShippingCost || 0);
     },
     weight: function() {
       let sum = 0;
@@ -171,6 +233,9 @@ export default {
         this.submit();
       }
     },
+    cancelEditPromoCode: function() {
+      this.isEditingPromoCode = false;
+    },
     cancelSubmit: function(error) {
       this.isSubmitting = false;
       this.stripeToken = null;
@@ -185,6 +250,9 @@ export default {
     closeSuccessMessage: function() {
       this.successEmail = null;
     },
+    editPromoCode: function() {
+      this.isEditingPromoCode = true;
+    },
     setCartFormData: function(data) {
       if (this.isSubmitting) {
         this.cartFormData = data;
@@ -193,6 +261,14 @@ export default {
     },
     setIsMailing: function(val) {
       this.isMailing = val;
+    },
+    setPromoCode: function(promoCode) {
+      if (promoCode && promoCode.code) {
+        this.promoCode = promoCode;
+      } else {
+        this.promoCode = null;
+      }
+      this.updateLocalStorage();
     },
     setStripeToken: function(token) {
       if (this.isSubmitting) {
@@ -218,6 +294,7 @@ export default {
           last_name: this.cartFormData.last_name,
           pickup_location: this.cartFormData.pickup_location,
           postal_code: this.cartFormData.postal_code,
+          promo_code: this.promoCodeCentsOff ? this.promoCode.code : null,
           province: this.cartFormData.province,
           stripe_token_id: this.stripeToken.id
         })
@@ -225,6 +302,8 @@ export default {
           // this.products = response.data.products;
           this.successEmail = this.cartFormData.email;
           this.$emit('clear-cart');
+          this.setPromoCode();
+          this.isMailing = false;
           this.isSubmitting = false;
           this.isSendingToAPI = false;
         })
@@ -244,6 +323,25 @@ export default {
         }
       }
       this.isSubmitting = true;
+    },
+    updateLocalStorage: function() {
+      if (this.isLocalStorageAvailable) {
+        localStorage.setItem('promoCode', JSON.stringify(this.promoCode));
+      }
+    }
+  },
+  mounted() {
+    try {
+      localStorage.setItem('test', 'test');
+      localStorage.removeItem('test');
+      this.isLocalStorageAvailable = true;
+    } catch (e) {
+      // don't need to do anything if this failed
+    }
+
+    const promoCode = localStorage.getItem('promoCode');
+    if (promoCode) {
+      this.promoCode = JSON.parse(promoCode);
     }
   }
 }

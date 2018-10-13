@@ -27,9 +27,11 @@ export default {
     return {
       error: false,
       forceShowLoading: true,
-      loading: true,
-      products: []
+      loading: true
     };
+  },
+  props: {
+    products: Array
   },
   computed: {
     showLoading: function() {
@@ -45,7 +47,7 @@ export default {
     axios
       .get(`${process.env.API_URL}/products`)
       .then((response) => {
-        this.products = response.data.products;
+        this.$emit('set-products', response.data.products);
         this.loading = false;
       })
       .catch((error) => {

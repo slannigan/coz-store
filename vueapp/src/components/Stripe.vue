@@ -6,6 +6,9 @@
       class="card-element stripe-input"
       v-bind:class="{ 'has-error': error }">
     </div>
+    <div class='stripe-info'>
+      Payments processed securely and confidentially by <a href='https://stripe.com/ca'>Stripe</a>.
+    </div>
     <div
       class="error"
       v-if="error">
@@ -85,5 +88,11 @@ export default {
 .stripe-container h3 {
   margin: 0 0 0.5rem;
   padding: 0;
+}
+
+.stripe-info {
+  color: #333;
+  font-size: 0.9rem;
+  margin: 0.25rem 0 0.5rem;
 }
 </style>

@@ -1,44 +1,44 @@
 create table products (
   id SERIAL PRIMARY KEY,
-  name text,
-  slug text,
-  grams integer,
-  cents integer,
-  description text,
+  name text NOT NULL,
+  slug text NOT NULL,
+  grams integer NOT NULL DEFAULT 0,
+  cents integer NOT NULL,
+  description text NOT NULL,
   created_at timestamptz NOT NULL DEFAULT NOW()
 );
 insert into products(name, slug, grams, cents, description) values (
   'Foreshadowing Light LIVE: CD Digital Download',
   'fl-live-mp3s',
   0,
-  900,
-  'MP3 files of all songs on the Foreshadowing Light LIVE CD.'
+  1500,
+  'Includes all songs, plus free additional access to digital lyric and art booklet.'
 );
 insert into products(name, slug, grams, cents, description) values (
   'Foreshadowing Light LIVE: CD',
   'fl-live-cd',
   150,
-  1200,
-  'CD with booklet containing lyrics and images.'
+  1500,
+  'Two disc CD. Includes sixteen page lyric and art booklet.'
 );
 insert into products(name, slug, grams, cents, description) values (
   'Foreshadowing Light LIVE: DVD',
   'fl-live-dvd',
   150,
-  1500,
-  'DVD of the live performance.'
+  2000,
+  'DVD of the live performance. Includes six page lyric and art booklet.'
 );
 insert into products(name, slug, grams, cents, description) values (
   'Foreshadowing Light LIVE: CD & DVD',
   'fl-live-cd-dvd',
   300,
-  2200,
-  'CD and DVD - save $5 by purchasing both!'
+  2500,
+  'CD and DVD - save $10 by purchasing both!'
 );
 insert into products(name, slug, grams, cents, description) values (
   'Donation',
   'donation',
   0,
   0,
-  'All proceeds go to future Citizen of Zion projects.'
+  'All proceeds go to future Citizen of Zion projects, and free copies for outreach purposes.'
 );

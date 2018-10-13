@@ -5,9 +5,12 @@
     <img class='logo' src='/static/img/logo-large.png'>
     <Video />
     <ProductList
+      v-bind:products='products'
+      v-on:set-products='setProducts'
       v-on:add-to-cart='addToCart' />
     <hr>
     <Cart
+      v-bind:products='products'
       v-bind:cart='cart'
       v-on:clear-cart='clearCart'
       v-on:remove-from-cart='removeFromCart'
@@ -50,6 +53,7 @@ export default {
     return {
       cart: [],
       isLocalStorageAvailable: false,
+      products: [],
       productToEdit: null
     };
   },
@@ -94,6 +98,9 @@ export default {
     removeFromCart: function(product) {
       this.cart.splice(this.cart.indexOf(product), 1);
       this.updateLocalStorage();
+    },
+    setProducts: function(products) {
+      this.products = products;
     },
     updateLocalStorage: function() {
       if (this.isLocalStorageAvailable) {
