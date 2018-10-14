@@ -160,10 +160,18 @@ export default {
       return (this.isMailing && this.shippingCost) || 0;
     },
     hasEditButton: function() {
-      return !!this.cart.find((item) => !item.cents );
+      return !!this.cart.find((item) => !item.cents ) || this.promoCode;
     },
     productsCost: function() {
       return this.cart.reduce((accumulator, currentVal) => {
+        return accumulator + currentVal.cents_charged;
+      }, 0);
+    },
+    productsCostNoDonations: function() {
+      return this.cart.reduce((accumulator, currentVal) => {
+        if (currentVal.slug === 'donation') {
+          return accumulator;
+        }
         return accumulator + currentVal.cents_charged;
       }, 0);
     },
@@ -182,7 +190,7 @@ export default {
           }
           return 0;
         }
-        return Math.floor(this.productsCost * percentOff);
+        return Math.floor(this.productsCostNoDonations * percentOff);
       }
     },
     promoCodeProduct: function() {
@@ -210,7 +218,7 @@ export default {
     },
     successAlertMessage: function() {
       if (this.successEmail) {
-        return `Your payment has been received! A receipt has been sent to ${this.successEmail}.`;
+        return `Your payment has been received! A receipt has been sent to ${this.successEmail}. If you are picking up an item, keep your receipt as proof of purchase.`;
       }
     },
     totalCost: function() {

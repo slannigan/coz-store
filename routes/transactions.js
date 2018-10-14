@@ -142,7 +142,7 @@ const validatePromoCode = async (code, email, client) => {
         product_slug,
         percent_off
       FROM promo_codes
-        WHERE code = '${code.toLowerCase()}'
+        WHERE code = '${code.toLowerCase().trim()}'
           AND expired_at IS NULL;
     `);
     const promoCode = result.rows[0];
@@ -310,7 +310,9 @@ const validateTransaction = async (vals, promoCode, client) => {
         promoCodeAmountOff = Math.floor(product.cents * percentOff);
       }
     } else {
-      promoCodeAmountOff = Math.floor(totalItemCost * percentOff);
+      const donation = vals.cart.find((obj) => obj.slug === 'donation');
+      const totalItemCostWithoutDonations = totalItemCost - (donation ? donation.cents_charged : 0);
+      promoCodeAmountOff = Math.floor(totalItemCostWithoutDonations * percentOff);
     }
   }
   if (vals.cents_charged_total !== (vals.cents_charged_shipping + totalItemCost - promoCodeAmountOff)) {

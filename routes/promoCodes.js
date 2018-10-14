@@ -9,7 +9,7 @@ const pool = new Pool({
 
 router.get('/promo_codes/:id', async (req, res) => {
   try {
-    const code = req.params.id.toLowerCase();
+    const code = req.params.id.toLowerCase().trim();
     const client = await pool.connect()
     const result = await client.query(`
       SELECT

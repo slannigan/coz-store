@@ -9,7 +9,10 @@
         <img v-bind:src="imgSrc" />
       </div>
       <div class='cost-container'>
-        <h4 v-if="product.cents">{{ cost }}</h4>
+        <h4 v-if="product.cents">
+          <span v-if="strikethroughPrice"><span class='strikethrough-price'>{{ strikethroughPrice }}</span><br></span>
+          {{ cost }}
+        </h4>
       </div>
       <button
         v-on:click="$emit('add-to-cart')">
@@ -23,7 +26,8 @@
 export default {
   name: 'Product',
   props: {
-    product: Object
+    product: Object,
+    products: Array
   },
   computed: {
     cost: function() {
@@ -48,6 +52,15 @@ export default {
           return donation;
       }
       return cd;
+    },
+    strikethroughPrice: function() {
+      if (this.product.slug === 'fl-live-cd-dvd') {
+        const cd = this.products.find((obj) => obj.slug === 'fl-live-cd');
+        const dvd = this.products.find((obj) => obj.slug === 'fl-live-dvd');
+        if (cd && dvd) {
+          return `$${((cd.cents + dvd.cents) / 100).toFixed(2)}`;
+        }
+      }
     }
   }
 };
@@ -74,5 +87,11 @@ img {
 
 .cost-container {
   min-height: 1.5rem;
+}
+
+.strikethrough-price {
+  color: #666;
+  font-weight: 400;
+  text-decoration: line-through;
 }
 </style>

@@ -126,7 +126,7 @@
     </div>
     <div
       v-else-if="shippingMethod">
-      We will email you details about how to pick up your order once it has been shipped to us.
+      We will email you details about how to pick up your order in December once it's ready.
       <br><br><br>
     </div>
   </div>

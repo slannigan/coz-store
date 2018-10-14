@@ -9,6 +9,7 @@
         v-for="product in products"
         v-bind:key="product.id"
         v-bind:product="product"
+        v-bind:products="products"
         v-on:add-to-cart="$emit('add-to-cart', product)" />
     </div>
   </div>
