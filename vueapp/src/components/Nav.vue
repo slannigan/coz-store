@@ -2,7 +2,7 @@
   <div class='nav-wrapper'>
     <div class="nav">
       <div class='container'>
-        <h3><a href='#about'>About</a></h3>
+        <h3><a href='#about'>Our Story</a></h3>
         <h3><a href='#shop'>Shop</a></h3>
         <h3><a href='#cart'>Cart ({{ itemsInCart }})</a></h3>
       </div>

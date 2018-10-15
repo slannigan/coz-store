@@ -29,7 +29,6 @@
 
 <style>
 .video-container {
-  margin-bottom: 2rem;
   max-width: 100%;
 }
 </style>

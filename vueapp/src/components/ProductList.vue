@@ -9,6 +9,7 @@
         v-for="product in products"
         v-bind:key="product.id"
         v-bind:product="product"
+        v-bind:products="products"
         v-on:add-to-cart="$emit('add-to-cart', product)" />
     </div>
   </div>
@@ -27,9 +28,11 @@ export default {
     return {
       error: false,
       forceShowLoading: true,
-      loading: true,
-      products: []
+      loading: true
     };
+  },
+  props: {
+    products: Array
   },
   computed: {
     showLoading: function() {
@@ -45,7 +48,7 @@ export default {
     axios
       .get(`${process.env.API_URL}/products`)
       .then((response) => {
-        this.products = response.data.products;
+        this.$emit('set-products', response.data.products);
         this.loading = false;
       })
       .catch((error) => {
@@ -61,6 +64,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  padding-top: 3rem;
 }
 
 .empty-container {

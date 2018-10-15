@@ -1,10 +1,13 @@
 <template>
   <div
-    v-on:click="close"
     class="modal-container">
     <div class="modal"
       v-on:click="sink">
-      <div class='center'>{{ text }}</div>
+      <div
+        v-html="text"
+        class='center'>
+        {{ text }}
+      </div>
       <button v-on:click="close">
         OK
       </button>

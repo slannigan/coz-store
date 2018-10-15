@@ -65,15 +65,9 @@
       <h3>Shipping Address</h3>
       <TextInput
         key="address-line-1"
-        label="Address Line 1"
+        label="Address"
         v-bind:val.sync="addressLine1"
         v-bind:error="errorAddressLine1"
-        v-bind:forceShowError="hasSubmitted" />
-      <TextInput
-        key="address-line-2"
-        label="Address Line 2"
-        v-bind:val.sync="addressLine2"
-        v-bind:error="errorAddressLine2"
         v-bind:forceShowError="hasSubmitted" />
       <TextInput
         key="city"
@@ -126,7 +120,7 @@
     </div>
     <div
       v-else-if="shippingMethod">
-      We will email you details about how to pick up your order once it has been shipped to us.
+      We will email you details about how to pick up your order in December once it's ready.
       <br><br><br>
     </div>
   </div>
@@ -148,7 +142,6 @@ export default {
   data: function() {
     return {
       addressLine1: '',
-      addressLine2: '',
       city: '',
       email: '',
       error: '',
@@ -165,17 +158,6 @@ export default {
         }, {
           isValid: this.lessThan(255),
           message: 'Address is too long.'
-        }, {
-          isValid: this.usesLegalLettersOrNumbers,
-          message: 'Can only use letters, numbers, commas, colons, periods, #, or spaces.'
-        }
-      ],
-      validationsAddressLine2: [
-        {
-          isValid: function(val) {
-            return this.val ? this.val.length < 255 : true;
-          },
-          message: 'Address line 2 is too long.'
         }, {
           isValid: this.usesLegalLettersOrNumbers,
           message: 'Can only use letters, numbers, commas, colons, periods, #, or spaces.'
@@ -249,9 +231,6 @@ export default {
     errorAddressLine1: function() {
       return this.getErrorMessage(this.addressLine1, this.validationsAddressLine1);
     },
-    errorAddressLine2: function() {
-      return this.getErrorMessage(this.addressLine2, this.validationsAddressLine2);
-    },
     errorCity: function() {
       return this.getErrorMessage(this.city, this.validationsCity);
     },
@@ -286,7 +265,6 @@ export default {
       };
       if (this.showAddressFields) {
         data.address_line_1 = this.addressLine1;
-        data.address_line_2 = this.addressLine2;
         data.city = this.city;
         data.province = this.province;
         data.postal_code = this.postalCode;
@@ -300,7 +278,6 @@ export default {
       let hasAddressErrors = false;
       if (this.showAddressFields) {
         hasAddressErrors = this.errorAddressLine1 ||
-          this.errorAddressLine2 ||
           this.errorCity ||
           this.errorProvince ||
           this.errorPostalCode;
@@ -421,5 +398,7 @@ export default {
 
 input[type=radio] {
   margin-left: 25%;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 </style>

@@ -5,9 +5,12 @@
     <img class='logo' src='/static/img/logo-large.png'>
     <Video />
     <ProductList
+      v-bind:products='products'
+      v-on:set-products='setProducts'
       v-on:add-to-cart='addToCart' />
     <hr>
     <Cart
+      v-bind:products='products'
       v-bind:cart='cart'
       v-on:clear-cart='clearCart'
       v-on:remove-from-cart='removeFromCart'
@@ -50,6 +53,7 @@ export default {
     return {
       cart: [],
       isLocalStorageAvailable: false,
+      products: [],
       productToEdit: null
     };
   },
@@ -67,6 +71,19 @@ export default {
         return this.productToEdit = product;
       }
       product.cents_charged = product.cents;
+      // If user has added a CD and DVD separately, combine into the cheaper CD+DVD product
+      if (product.slug === 'fl-live-cd' || product.slug === 'fl-live-dvd') {
+        const partnerSlug = (product.slug === 'fl-live-cd') ? 'fl-live-dvd' : 'fl-live-cd';
+        const partnerProduct = this.cart.find((obj) => obj.slug === partnerSlug);
+        if (partnerProduct) {
+          const partnerProductIndex = this.cart.indexOf(partnerProduct);
+          this.cart.splice(partnerProductIndex, 1);
+          const combinedProduct = this.products.find((obj) => obj.slug === 'fl-live-cd-dvd');
+          this.cart.push(combinedProduct);
+          this.updateLocalStorage();
+          return;
+        }
+      }
       this.cart.push(product);
       this.updateLocalStorage();
     },
@@ -94,6 +111,9 @@ export default {
     removeFromCart: function(product) {
       this.cart.splice(this.cart.indexOf(product), 1);
       this.updateLocalStorage();
+    },
+    setProducts: function(products) {
+      this.products = products;
     },
     updateLocalStorage: function() {
       if (this.isLocalStorageAvailable) {

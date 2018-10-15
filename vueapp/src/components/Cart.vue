@@ -28,6 +28,26 @@
           </div>
         </div>
         <div
+          v-if="promoCode"
+          class='cart-product'>
+          <div class='left'>
+            <div
+              class='buttons-container'
+              v-bind:class="{ 'has-edit-button': hasEditButton }">
+              <button
+                v-on:click="setPromoCode">
+                x
+              </button>
+            </div>
+            <div>
+              {{ promoCode.code.toUpperCase() }}: {{ promoCode.percent_off }}% off {{ promoCode.product_slug ? (promoCodeProduct && promoCodeProduct.name || promoCode.product_slug) : '' }}
+            </div>
+          </div>
+          <div>
+            -{{ centsToDollars(promoCodeCentsOff) || '$0.00' }}
+          </div>
+        </div>
+        <div
           v-if="chargedShippingCost"
           class='cart-product'>
           <div class='left'>
@@ -46,6 +66,10 @@
         <hr>
         <div class='total'>
           <h4>Total: {{ centsToDollars(totalCost) }}</h4>
+          <button
+            v-on:click="editPromoCode">
+            {{ promoCodeBtnText }}
+          </button>
         </div>
         <br>
         <CartForm
@@ -78,21 +102,33 @@
           </button>
         </div>
       </div>
+      <div
+        v-else-if="successAlertMessage"
+        v-html="successAlertMessage">
+        {{ successAlertMessage }}
+      </div>
       <div v-else>
         Your cart is empty.
       </div>
     </div>
     <AlertModal
-      v-if="successAlertMessage"
+      v-if="showSuccessModal"
       v-bind:text="successAlertMessage"
       v-on:close="closeSuccessMessage" />
+    <PromoCodeModal
+      v-if="isEditingPromoCode"
+      v-bind:promoCode="promoCode"
+      v-on:cancel-edit="cancelEditPromoCode"
+      v-on:set-promo-code="setPromoCode" />
   </div>
 </template>
 
 <script>
 import AlertModal from './AlertModal.vue';
 import CartForm from './CartForm.vue';
+import PromoCodeModal from './PromoCodeModal.vue';
 import Stripe from './Stripe.vue';
+import Vue from 'vue';
 const axios = require('axios');
 
 export default {
@@ -100,21 +136,29 @@ export default {
   components: {
     AlertModal,
     CartForm,
+    PromoCodeModal,
     Stripe
   },
   data: function() {
     return {
       cartFormData: null,
       error: '',
+      isEditingPromoCode: false,
+      isLocalStorageAvailable: false,
       isMailing: false,
       isSendingToAPI: false,
       isSubmitting: false,
+      promoCode: null,
+      hasPurchasedDownload: false,
+      hasPurchasedNeedsPickup: false,
+      showSuccessModal: false,
       successEmail: '',
       stripeToken: null
     }
   },
   props: {
-    cart: Array
+    cart: Array,
+    products: Array
   },
   computed: {
     chargedShippingCost: function() {
@@ -127,6 +171,37 @@ export default {
       return this.cart.reduce((accumulator, currentVal) => {
         return accumulator + currentVal.cents_charged;
       }, 0);
+    },
+    productsCostNoDonations: function() {
+      return this.cart.reduce((accumulator, currentVal) => {
+        if (currentVal.slug === 'donation') {
+          return accumulator;
+        }
+        return accumulator + currentVal.cents_charged;
+      }, 0);
+    },
+    promoCodeBtnText: function() {
+      if (this.promoCode) {
+        return 'Change promo code';
+      }
+      return 'Apply promo code';
+    },
+    promoCodeCentsOff: function() {
+      if (this.promoCode) {
+        const percentOff = this.promoCode.percent_off / 100;
+        if (this.promoCode.product_slug) {
+          if (this.promoCodeProduct) {
+            return Math.floor(this.promoCodeProduct.cents_charged * percentOff);
+          }
+          return 0;
+        }
+        return Math.floor(this.productsCostNoDonations * percentOff);
+      }
+    },
+    promoCodeProduct: function() {
+      if (this.promoCode && this.promoCode.product_slug) {
+        return this.products.find((obj) => obj.slug === this.promoCode.product_slug);
+      }
     },
     shippingCost: function() {
       const weight = this.weight;
@@ -148,11 +223,18 @@ export default {
     },
     successAlertMessage: function() {
       if (this.successEmail) {
-        return `Your payment has been received! A receipt has been sent to ${this.successEmail}.`;
+        let success = `Your payment has been received! A receipt has been sent to ${this.successEmail}.`;
+        if (this.hasPurchasedNeedsPickup) {
+          success += `<br><br>Bring your receipt when picking up your items.`;
+        }
+        if (this.hasPurchasedDownload) {
+          success += `<br><br>An email with a link to your download will be sent in December, when the download is ready.`;
+        }
+        return success;
       }
     },
     totalCost: function() {
-      return this.productsCost + (this.chargedShippingCost || 0);
+      return this.productsCost - (this.promoCodeCentsOff || 0) + (this.chargedShippingCost || 0);
     },
     weight: function() {
       let sum = 0;
@@ -171,8 +253,12 @@ export default {
         this.submit();
       }
     },
+    cancelEditPromoCode: function() {
+      this.isEditingPromoCode = false;
+    },
     cancelSubmit: function(error) {
       this.isSubmitting = false;
+      this.isSendingToAPI = false;
       this.stripeToken = null;
       this.cartFormData = null;
       this.error = error || '';
@@ -183,7 +269,10 @@ export default {
       }
     },
     closeSuccessMessage: function() {
-      this.successEmail = null;
+      this.showSuccessModal = false;
+    },
+    editPromoCode: function() {
+      this.isEditingPromoCode = true;
     },
     setCartFormData: function(data) {
       if (this.isSubmitting) {
@@ -193,6 +282,14 @@ export default {
     },
     setIsMailing: function(val) {
       this.isMailing = val;
+    },
+    setPromoCode: function(promoCode) {
+      if (promoCode && promoCode.code) {
+        this.promoCode = promoCode;
+      } else {
+        this.promoCode = null;
+      }
+      this.updateLocalStorage();
     },
     setStripeToken: function(token) {
       if (this.isSubmitting) {
@@ -208,7 +305,6 @@ export default {
       axios
         .post(`${process.env.API_URL}/transactions`, {
           address_line_1: this.cartFormData.address_line_1,
-          address_line_2: this.cartFormData.address_line_2,
           cart: this.cart,
           cents_charged_shipping: this.chargedShippingCost,
           cents_charged_total: this.totalCost,
@@ -218,24 +314,35 @@ export default {
           last_name: this.cartFormData.last_name,
           pickup_location: this.cartFormData.pickup_location,
           postal_code: this.cartFormData.postal_code,
+          promo_code: this.promoCodeCentsOff ? this.promoCode.code : null,
           province: this.cartFormData.province,
           stripe_token_id: this.stripeToken.id
         })
         .then((response) => {
-          // this.products = response.data.products;
-          this.successEmail = this.cartFormData.email;
+          // Get variables for success message
+          const successEmail = this.cartFormData.email;
+          const hasPurchasedDownload = !!this.cart.find((obj) => obj.slug === 'fl-live-mp3s');
+          const hasPurchasedNeedsPickup = !!this.weight;
+          this.showSuccessModal = true;
+          // Reset data
           this.$emit('clear-cart');
-          this.isSubmitting = false;
-          this.isSendingToAPI = false;
+          this.cancelSubmit();
+          this.setPromoCode();
+          this.isMailing = false;
+          // Set variables for success message (wait for next tick, after cart is cleared)
+          Vue.nextTick(() => {
+            this.successEmail = successEmail;
+            this.hasPurchasedDownload = hasPurchasedDownload;
+            this.hasPurchasedNeedsPickup = hasPurchasedNeedsPickup
+            this.showSuccessModal = true;
+          });
         })
         .catch((error) => {
-          this.error = error.response.data || error.response.statusText;
-          this.isSubmitting = false;
-          this.isSendingToAPI = false;
+          this.cancelSubmit(error.response.data || error.response.statusText);
         });
     },
     triggerSubmit: function() {
-      this.error = '';
+      this.cancelSubmit();
       const donation = this.cart.find((item) => item.slug === 'donation');
       if (donation && donation.cents_charged > 10000) {
         const confirmDonation = confirm(`$${(donation.cents_charged / 100).toFixed(2)} is a generous donation! Click OK to confirm.`);
@@ -244,6 +351,32 @@ export default {
         }
       }
       this.isSubmitting = true;
+    },
+    updateLocalStorage: function() {
+      if (this.isLocalStorageAvailable) {
+        localStorage.setItem('promoCode', JSON.stringify(this.promoCode));
+      }
+    }
+  },
+  watch: {
+    cart: function() {
+      this.successEmail = null;
+      this.hasPurchasedDownload = false;
+      this.hasPurchasedNeedsPickup = false;
+    }
+  },
+  mounted() {
+    try {
+      localStorage.setItem('test', 'test');
+      localStorage.removeItem('test');
+      this.isLocalStorageAvailable = true;
+    } catch (e) {
+      // don't need to do anything if this failed
+    }
+
+    const promoCode = localStorage.getItem('promoCode');
+    if (promoCode) {
+      this.promoCode = JSON.parse(promoCode);
     }
   }
 }
