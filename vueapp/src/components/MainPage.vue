@@ -3,7 +3,7 @@
     <Nav
       v-bind:itemsInCart='cart.length' />
     <img class='logo' src='/static/img/logo-large.png'>
-    <Video />
+    <!-- <Video /> -->
     <ProductList
       v-bind:products='products'
       v-on:set-products='setProducts'

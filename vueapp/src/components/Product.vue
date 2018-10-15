@@ -75,10 +75,12 @@ export default {
   methods: {
     addToCart: function() {
       this.$emit('add-to-cart');
-      this.justClicked = true;
-      setTimeout(() => {
-        this.justClicked = false;
-      }, 1000);
+      if (this.product.slug !== 'donation') {
+        this.justClicked = true;
+        setTimeout(() => {
+          this.justClicked = false;
+        }, 1000);
+      }
     }
   }
 };
