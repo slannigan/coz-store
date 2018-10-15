@@ -64,6 +64,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  padding-top: 3rem;
 }
 
 .empty-container {

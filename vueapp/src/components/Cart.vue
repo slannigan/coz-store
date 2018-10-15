@@ -35,10 +35,6 @@
               class='buttons-container'
               v-bind:class="{ 'has-edit-button': hasEditButton }">
               <button
-                v-on:click="editPromoCode">
-                Edit
-              </button>
-              <button
                 v-on:click="setPromoCode">
                 x
               </button>
@@ -106,12 +102,17 @@
           </button>
         </div>
       </div>
+      <div
+        v-else-if="successAlertMessage"
+        v-html="successAlertMessage">
+        {{ successAlertMessage }}
+      </div>
       <div v-else>
         Your cart is empty.
       </div>
     </div>
     <AlertModal
-      v-if="successAlertMessage"
+      v-if="showSuccessModal"
       v-bind:text="successAlertMessage"
       v-on:close="closeSuccessMessage" />
     <PromoCodeModal
@@ -127,6 +128,7 @@ import AlertModal from './AlertModal.vue';
 import CartForm from './CartForm.vue';
 import PromoCodeModal from './PromoCodeModal.vue';
 import Stripe from './Stripe.vue';
+import Vue from 'vue';
 const axios = require('axios');
 
 export default {
@@ -147,6 +149,9 @@ export default {
       isSendingToAPI: false,
       isSubmitting: false,
       promoCode: null,
+      hasPurchasedDownload: false,
+      hasPurchasedNeedsPickup: false,
+      showSuccessModal: false,
       successEmail: '',
       stripeToken: null
     }
@@ -160,7 +165,7 @@ export default {
       return (this.isMailing && this.shippingCost) || 0;
     },
     hasEditButton: function() {
-      return !!this.cart.find((item) => !item.cents ) || this.promoCode;
+      return !!this.cart.find((item) => !item.cents );
     },
     productsCost: function() {
       return this.cart.reduce((accumulator, currentVal) => {
@@ -218,7 +223,14 @@ export default {
     },
     successAlertMessage: function() {
       if (this.successEmail) {
-        return `Your payment has been received! A receipt has been sent to ${this.successEmail}. If you are picking up an item, keep your receipt as proof of purchase.`;
+        let success = `Your payment has been received! A receipt has been sent to ${this.successEmail}.`;
+        if (this.hasPurchasedNeedsPickup) {
+          success += `<br><br>Bring your receipt when picking up your items.`;
+        }
+        if (this.hasPurchasedDownload) {
+          success += `<br><br>An email with a link to your download will be sent in December, when the download is ready.`;
+        }
+        return success;
       }
     },
     totalCost: function() {
@@ -246,6 +258,7 @@ export default {
     },
     cancelSubmit: function(error) {
       this.isSubmitting = false;
+      this.isSendingToAPI = false;
       this.stripeToken = null;
       this.cartFormData = null;
       this.error = error || '';
@@ -256,7 +269,7 @@ export default {
       }
     },
     closeSuccessMessage: function() {
-      this.successEmail = null;
+      this.showSuccessModal = false;
     },
     editPromoCode: function() {
       this.isEditingPromoCode = true;
@@ -292,7 +305,6 @@ export default {
       axios
         .post(`${process.env.API_URL}/transactions`, {
           address_line_1: this.cartFormData.address_line_1,
-          address_line_2: this.cartFormData.address_line_2,
           cart: this.cart,
           cents_charged_shipping: this.chargedShippingCost,
           cents_charged_total: this.totalCost,
@@ -307,22 +319,30 @@ export default {
           stripe_token_id: this.stripeToken.id
         })
         .then((response) => {
-          // this.products = response.data.products;
-          this.successEmail = this.cartFormData.email;
+          // Get variables for success message
+          const successEmail = this.cartFormData.email;
+          const hasPurchasedDownload = !!this.cart.find((obj) => obj.slug === 'fl-live-mp3s');
+          const hasPurchasedNeedsPickup = !!this.weight;
+          this.showSuccessModal = true;
+          // Reset data
           this.$emit('clear-cart');
+          this.cancelSubmit();
           this.setPromoCode();
           this.isMailing = false;
-          this.isSubmitting = false;
-          this.isSendingToAPI = false;
+          // Set variables for success message (wait for next tick, after cart is cleared)
+          Vue.nextTick(() => {
+            this.successEmail = successEmail;
+            this.hasPurchasedDownload = hasPurchasedDownload;
+            this.hasPurchasedNeedsPickup = hasPurchasedNeedsPickup
+            this.showSuccessModal = true;
+          });
         })
         .catch((error) => {
-          this.error = error.response.data || error.response.statusText;
-          this.isSubmitting = false;
-          this.isSendingToAPI = false;
+          this.cancelSubmit(error.response.data || error.response.statusText);
         });
     },
     triggerSubmit: function() {
-      this.error = '';
+      this.cancelSubmit();
       const donation = this.cart.find((item) => item.slug === 'donation');
       if (donation && donation.cents_charged > 10000) {
         const confirmDonation = confirm(`$${(donation.cents_charged / 100).toFixed(2)} is a generous donation! Click OK to confirm.`);
@@ -336,6 +356,13 @@ export default {
       if (this.isLocalStorageAvailable) {
         localStorage.setItem('promoCode', JSON.stringify(this.promoCode));
       }
+    }
+  },
+  watch: {
+    cart: function() {
+      this.successEmail = null;
+      this.hasPurchasedDownload = false;
+      this.hasPurchasedNeedsPickup = false;
     }
   },
   mounted() {

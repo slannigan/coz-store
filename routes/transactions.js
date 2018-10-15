@@ -26,7 +26,6 @@ router.post('/transactions', wrap(async (req, res, next) => {
           last_name,
           email,
           address_line_1,
-          address_line_2,
           city,
           province,
           postal_code,
@@ -39,7 +38,6 @@ router.post('/transactions', wrap(async (req, res, next) => {
           '${req.body.last_name.trim()}',
           '${req.body.email.trim()}',
           '${(req.body.address_line_1 || '').trim()}',
-          '${(req.body.address_line_2 || '').trim()}',
           '${(req.body.city || '').trim()}',
           '${(req.body.province || '')}',
           '${(req.body.postal_code || '').toUpperCase().trim()}',
@@ -272,16 +270,10 @@ const validateTransaction = async (vals, promoCode, client) => {
       }
 
       // Validate address fields
-      validate(vals.address_line_1, v.required, 'Address line 1 is required.');
-      validate(vals.address_line_1, v.isString, 'Address line 1 does not have the correct format.');
-      validate(vals.address_line_1, v.usesLegalLettersOrNumbers, 'Address line 1 contains invalid characters.');
-      validate(vals.address_line_1, v.lessThan(255), 'Address line 1 is too long.');
-
-      if (vals.address_line_2) {
-        validate(vals.address_line_2, v.isString, 'Address line 2 does not have the correct format.');
-        validate(vals.address_line_2, v.usesLegalLettersOrNumbers, 'Address line 2 contains invalid characters.');
-        validate(vals.address_line_2, v.lessThan(255), 'Address line 2 is too long.');
-      }
+      validate(vals.address_line_1, v.required, 'Address is required.');
+      validate(vals.address_line_1, v.isString, 'Address does not have the correct format.');
+      validate(vals.address_line_1, v.usesLegalLettersOrNumbers, 'Address contains invalid characters.');
+      validate(vals.address_line_1, v.lessThan(255), 'Address is too long.');
 
       validate(vals.city, v.required, 'City is required.');
       validate(vals.city, v.isString, 'City does not have the correct format.');

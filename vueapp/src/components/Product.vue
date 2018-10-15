@@ -14,8 +14,12 @@
           {{ cost }}
         </h4>
       </div>
+      <div class='added' v-if="justClicked">
+        Added!
+      </div>
       <button
-        v-on:click="$emit('add-to-cart')">
+        v-else
+        v-on:click="addToCart">
         Add to cart
       </button>
     </div>
@@ -25,6 +29,11 @@
 <script>
 export default {
   name: 'Product',
+  data: function() {
+    return {
+      justClicked: false
+    }
+  },
   props: {
     product: Object,
     products: Array
@@ -62,6 +71,15 @@ export default {
         }
       }
     }
+  },
+  methods: {
+    addToCart: function() {
+      this.$emit('add-to-cart');
+      this.justClicked = true;
+      setTimeout(() => {
+        this.justClicked = false;
+      }, 1000);
+    }
   }
 };
 </script>
@@ -93,5 +111,12 @@ img {
   color: #666;
   font-weight: 400;
   text-decoration: line-through;
+}
+
+.added {
+  background-color: #4a9b1d;
+  color: #fff;
+  display: inline-block;
+  padding: calc(0.5rem + 1px) 1rem;
 }
 </style>

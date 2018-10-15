@@ -7,7 +7,7 @@
       v-bind:class="{ 'has-error': error }">
     </div>
     <div class='stripe-info'>
-      Payments processed securely and confidentially by <a href='https://stripe.com/ca'>Stripe</a>.
+      Payments processed securely and confidentially by <a href='https://stripe.com/ca' target='_blank' rel=noopener>Stripe</a>.
     </div>
     <div
       class="error"

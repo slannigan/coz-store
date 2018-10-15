@@ -1,6 +1,6 @@
 <template>
   <div class="footer">
-    © Citizen of Zion 2018
+    © 2018 Citizen of Zion
   </div>
 </template>
 
