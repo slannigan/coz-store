@@ -151,6 +151,7 @@ export default {
       promoCode: null,
       hasPurchasedDownload: false,
       hasPurchasedNeedsPickup: false,
+      hasPurchasedNeedsShipping: false,
       showSuccessModal: false,
       successEmail: '',
       stripeToken: null
@@ -226,6 +227,9 @@ export default {
         let success = `Your payment has been received! A receipt has been sent to ${this.successEmail}.`;
         if (this.hasPurchasedNeedsPickup) {
           success += `<br><br>Bring your receipt when picking up your items.`;
+        }
+        if (this.hasPurchasedNeedsShipping || this.hasPurchasedNeedsPickup) {
+          success += `<br><br>Your order will arrive in December.`;
         }
         if (this.hasPurchasedDownload) {
           success += `<br><br>An email with a link to your download will be sent in December, when the download is ready.`;
@@ -322,7 +326,8 @@ export default {
           // Get variables for success message
           const successEmail = this.cartFormData.email;
           const hasPurchasedDownload = !!this.cart.find((obj) => obj.slug === 'fl-live-mp3s');
-          const hasPurchasedNeedsPickup = !!this.weight;
+          const hasPurchasedNeedsShipping = !!this.weight && this.cartFormData.pickup_location === 'mail';
+          const hasPurchasedNeedsPickup = !!this.weight && !hasPurchasedNeedsShipping;
           this.showSuccessModal = true;
           // Reset data
           this.$emit('clear-cart');
@@ -334,6 +339,7 @@ export default {
             this.successEmail = successEmail;
             this.hasPurchasedDownload = hasPurchasedDownload;
             this.hasPurchasedNeedsPickup = hasPurchasedNeedsPickup
+            this.hasPurchasedNeedsShipping = hasPurchasedNeedsShipping
             this.showSuccessModal = true;
           });
         })
@@ -363,6 +369,7 @@ export default {
       this.successEmail = null;
       this.hasPurchasedDownload = false;
       this.hasPurchasedNeedsPickup = false;
+      this.hasPurchasedNeedsShipping = false;
     }
   },
   mounted() {
