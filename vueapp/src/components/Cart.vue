@@ -23,7 +23,7 @@
               {{ product.name }}
             </div>
           </div>
-          <div>
+          <div class='cents-charged'>
             {{ centsToDollars(product.cents_charged) }}
           </div>
         </div>
@@ -325,7 +325,7 @@ export default {
         .then((response) => {
           // Get variables for success message
           const successEmail = this.cartFormData.email;
-          const hasPurchasedDownload = !!this.cart.find((obj) => obj.slug === 'fl-live-mp3s');
+          const hasPurchasedDownload = !!this.cart.find((obj) => obj.slug.indexOf('mp3s') > -1);
           const hasPurchasedNeedsShipping = !!this.weight && this.cartFormData.pickup_location === 'mail';
           const hasPurchasedNeedsPickup = !!this.weight && !hasPurchasedNeedsShipping;
           this.showSuccessModal = true;
@@ -432,5 +432,9 @@ export default {
 .cart hr {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
+}
+
+.cents-charged {
+  margin-left: 1rem;
 }
 </style>

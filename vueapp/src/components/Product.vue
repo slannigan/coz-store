@@ -44,7 +44,7 @@ export default {
     },
     imgSrc: function() {
       const cd = require('../assets/img/fl-live-cd.png');
-      const cdAndDvd = require('../assets/img/fl-live-cd-dvd.png');
+      const dvdAndDownload = require('../assets/img/fl-live-dvd-mp3s.png');
       const donation = require('../assets/img/donation.png');
       const dvd = require('../assets/img/fl-live-dvd.png');
       const mp3s = require('../assets/img/fl-live-mp3s.png');
@@ -55,8 +55,8 @@ export default {
           return cd;
         case 'fl-live-dvd':
           return dvd;
-        case 'fl-live-cd-dvd':
-          return cdAndDvd;
+        case 'fl-live-dvd-mp3s':
+          return dvdAndDownload;
         case 'donation':
           return donation;
       }

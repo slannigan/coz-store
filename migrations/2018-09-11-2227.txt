@@ -12,7 +12,7 @@ insert into products(name, slug, grams, cents, description) values (
   'fl-live-mp3s',
   0,
   1500,
-  'Includes all songs, plus free additional access to digital lyric and art booklet.'
+  'Includes all songs, plus free additional access to digital lyric and art booklet. Will be sent out in December.'
 );
 insert into products(name, slug, grams, cents, description) values (
   'Foreshadowing Light LIVE: CD',
@@ -29,11 +29,11 @@ insert into products(name, slug, grams, cents, description) values (
   'DVD of the live performance. Includes six page lyric and art booklet.'
 );
 insert into products(name, slug, grams, cents, description) values (
-  'Foreshadowing Light LIVE: CD & DVD',
-  'fl-live-cd-dvd',
-  300,
+  'Foreshadowing Light LIVE: DVD, and Digital Download of CD',
+  'fl-live-dvd-mp3s',
+  150,
   2500,
-  'CD and DVD - save $10 by purchasing both!'
+  'DVD, and digital download of CD - save $10 by purchasing both!'
 );
 insert into products(name, slug, grams, cents, description) values (
   'Donation',
