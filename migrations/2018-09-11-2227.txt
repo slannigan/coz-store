@@ -33,7 +33,7 @@ insert into products(name, slug, grams, cents, description) values (
   'fl-live-dvd-mp3s',
   150,
   2500,
-  'DVD and digital download - save $10 by purchasing both!'
+  'DVD, and digital download of CD - save $10 by purchasing both!'
 );
 insert into products(name, slug, grams, cents, description) values (
   'Donation',

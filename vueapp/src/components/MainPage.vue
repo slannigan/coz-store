@@ -79,8 +79,7 @@ export default {
           const partnerProductIndex = this.cart.indexOf(partnerProduct);
           this.cart.splice(partnerProductIndex, 1);
           const combinedProduct = this.products.find((obj) => obj.slug === 'fl-live-dvd-mp3s');
-          this.cart.push(combinedProduct);
-          this.updateLocalStorage();
+          this.addToCart(combinedProduct);
           return;
         }
       }
