@@ -59,15 +59,13 @@ export default {
   },
   methods: {
     addToCart: function(product) {
-      if (!product.grams) {
-        const alreadyPurchased = !!this.cart.find((otherProduct) => {
+      if (product.slug === 'donation') {
+        const alreadyPurchased = this.cart.find((otherProduct) => {
           return otherProduct.id === product.id;
         });
-        if (alreadyPurchased) {
-          return alert(`You can only purchase one ${product.name}.`);
+        if (!!alreadyPurchased) {
+          return this.productToEdit = alreadyPurchased;
         }
-      }
-      if (product.slug === 'donation') {
         return this.productToEdit = product;
       }
       product.cents_charged = product.cents;

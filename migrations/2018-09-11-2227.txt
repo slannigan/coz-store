@@ -19,7 +19,7 @@ insert into products(name, slug, grams, cents, description) values (
   'fl-live-cd',
   150,
   1500,
-  'Two disc CD. Includes sixteen page lyric and art booklet.'
+  'Two disc CD. Includes twenty page lyric and art booklet.'
 );
 insert into products(name, slug, grams, cents, description) values (
   'Foreshadowing Light LIVE: DVD',
