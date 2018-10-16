@@ -10,7 +10,7 @@ const pool = new Pool({
 router.get('/products', async (req, res) => {
   try {
     const client = await pool.connect()
-    const result = await client.query('SELECT * FROM products');
+    const result = await client.query('SELECT * FROM products ORDER BY id DESC');
     const results = { 'products': (result) ? result.rows : null};
     client.release();
     res.send(results);
