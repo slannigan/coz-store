@@ -12,7 +12,7 @@ insert into products(name, slug, grams, cents, description) values (
   'fl-live-mp3s',
   0,
   1500,
-  'Includes all songs, plus free additional access to digital lyric and art booklet. Will be sent out in December.'
+  'Includes all songs, plus free additional access to digital lyric and art booklet.'
 );
 insert into products(name, slug, grams, cents, description) values (
   'Foreshadowing Light LIVE: CD',

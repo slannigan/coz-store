@@ -4,6 +4,7 @@
       v-bind:itemsInCart='cart.length' />
     <img class='logo' src='/static/img/logo-large.png'>
     <!-- <Video /> -->
+    <h2>Select Items for Preorder</h2>
     <ProductList
       v-bind:products='products'
       v-on:set-products='setProducts'
@@ -148,5 +149,13 @@ export default {
   margin-bottom: 2rem;
   max-width: calc(100% - 4rem);
   width: 500px;
+}
+
+h2 {
+  color: #fff;
+  font-size: 1.75rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  margin-top: 2rem;
 }
 </style>
