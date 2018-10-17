@@ -1,9 +1,9 @@
 <template>
   <div class='video-container'>
     <iframe
-      src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2F351745441591589%2Fvideos%2F461079663991499%2F&show_text=0&width=560"
-      width="300"
-      height="225"
+      src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2F351745441591589%2Fvideos%2F249324349090933%2F&show_text=0&width=560"
+      width="400"
+      height="280"
       style="border:none;overflow:hidden"
       scrolling="no"
       frameborder="0"
@@ -30,5 +30,9 @@
 <style>
 .video-container {
   max-width: 100%;
+}
+
+iframe {
+  max-width: 90%;
 }
 </style>
