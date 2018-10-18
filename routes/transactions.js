@@ -18,6 +18,14 @@ router.post('/transactions', wrap(async (req, res, next) => {
     client = await pool.connect();
     const promoCode = await validatePromoCode(req.body.promo_code, req.body.email, client);
     await validateTransaction(req.body, promoCode, client);
+    let city;
+    if (req.body.city) {
+      city = req.body.city;
+    } else if (req.body.pickup_location === 'orangeville') {
+      city = 'Orangeville';
+    } else if (req.body.pickup_location === 'waterloo') {
+      city = 'Waterloo';
+    }
     await client.query('BEGIN');
     const transaction = await client.query(`
       INSERT INTO
@@ -38,7 +46,7 @@ router.post('/transactions', wrap(async (req, res, next) => {
           '${req.body.last_name.trim()}',
           '${req.body.email.trim()}',
           '${(req.body.address_line_1 || '').trim()}',
-          '${(req.body.city || '').trim()}',
+          '${(city || '').trim()}',
           '${(req.body.province || '')}',
           '${(req.body.postal_code || '').toUpperCase().trim()}',
           ${req.body.cents_charged_shipping},
